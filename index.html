@@ -5,276 +5,271 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rekap Kerja - Tim IT DPRD Langkat</title>
 <style>
- :root{
- --ink:#132A4C;
- --ink2:#1C3D6E;
- --ink-soft:#5B6B7A;
- --paper:#F2F4F8;
- --card:#FFFFFF;
- --line:#E3E7EE;
- --accent:#2F6FE4;
- --accent-soft:#E8F0FE;
- --gold:#B8863B;
- --gold-soft:#F1E4C8;
- --libur:#D0463C;
- --libur-soft:#FBE7E5;
- --ok:#1D8A55;
- --ok-soft:#E1F5E9;
- --header-bg:#EAF0F9;
- --radius:12px;
- }
- *{box-sizing:border-box;}
- html,body{margin:0;padding:0;height:100%;}
- body{
- background:var(--paper);
- color:var(--ink);
- font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
- font-size:15px;
- line-height:1.5;
- }
- h1,h2,h3{font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif; margin:0; font-weight:600;}
- .app{display:flex; min-height:100vh;}
+  :root{
+    --ink:#132A4C;
+    --ink2:#1C3D6E;
+    --ink-soft:#5B6B7A;
+    --paper:#F2F4F8;
+    --card:#FFFFFF;
+    --line:#E3E7EE;
+    --accent:#2F6FE4;
+    --accent-soft:#E8F0FE;
+    --gold:#B8863B;
+    --gold-soft:#F1E4C8;
+    --libur:#D0463C;
+    --libur-soft:#FBE7E5;
+    --ok:#1D8A55;
+    --ok-soft:#E1F5E9;
+    --header-bg:#EAF0F9;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+  }
+  h1,h2,h3{font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif; margin:0; font-weight:600;}
+  .app{display:flex; min-height:100vh;}
 
- /* Sidebar */
- .sidebar{
- width:264px; flex-shrink:0;
- background:linear-gradient(180deg, var(--ink) 0%, var(--ink2) 100%); color:#EDEFEA;
- padding:22px 16px; display:flex; flex-direction:column; gap:22px;
- position:sticky; top:0; height:100vh; overflow-y:auto; align-self:flex-start;
- }
- .brand{display:flex; align-items:center; gap:10px;}
- .brand-icon{width:38px; height:38px; border-radius:10px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
- .brand h1{font-size:17px; color:#fff; line-height:1.25;}
- .brand p{margin:3px 0 0; font-size:11.5px; color:#9DAAB6;}
- .sidebar hr{border:none; border-top:1px solid rgba(255,255,255,0.12); margin:0;}
+  /* Sidebar */
+  .sidebar{
+    width:264px; flex-shrink:0;
+    background:linear-gradient(180deg, var(--ink) 0%, var(--ink2) 100%); color:#EDEFEA;
+    padding:22px 16px; display:flex; flex-direction:column; gap:22px;
+    position:sticky; top:0; height:100vh; overflow-y:auto; align-self:flex-start;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-icon{width:38px; height:38px; border-radius:10px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
+  .brand h1{font-size:17px; color:#fff; line-height:1.25;}
+  .brand p{margin:3px 0 0; font-size:11.5px; color:#9DAAB6;}
+  .sidebar hr{border:none; border-top:1px solid rgba(255,255,255,0.12); margin:0;}
 
- nav.tabs{display:flex; flex-direction:column; gap:2px;}
- nav.tabs button{
- text-align:left; background:transparent; border:none; color:#C9D1D7;
- padding:10px 12px; border-radius:9px; cursor:pointer; font-size:14.5px;
- display:flex; align-items:center; gap:10px;
- }
- nav.tabs button .ico{width:18px; text-align:center; flex-shrink:0;}
- nav.tabs button:hover{background:rgba(255,255,255,0.08);}
- nav.tabs button.active{background:var(--accent); color:#fff; font-weight:600;}
+  nav.tabs{display:flex; flex-direction:column; gap:2px;}
+  nav.tabs button{
+    text-align:left; background:transparent; border:none; color:#C9D1D7;
+    padding:10px 12px; border-radius:9px; cursor:pointer; font-size:14.5px;
+    display:flex; align-items:center; gap:10px;
+  }
+  nav.tabs button .ico{width:18px; text-align:center; flex-shrink:0;}
+  nav.tabs button:hover{background:rgba(255,255,255,0.08);}
+  nav.tabs button.active{background:var(--accent); color:#fff; font-weight:600;}
 
- .section-label{font-size:11px; color:#8CA0AF; text-transform:uppercase; letter-spacing:.05em; margin:0 0 4px 4px;}
- .person-list{display:flex; flex-direction:column; gap:5px;}
- .person-btn{
- text-align:left; background:transparent; border:1px solid transparent; color:#D6DCE1;
- padding:8px 9px; border-radius:9px; cursor:pointer; font-size:13.5px; display:flex; align-items:center; gap:9px;
- width:100%;
- }
- .person-btn .role{font-size:11px; color:#8CA0AF; display:block;}
- .person-btn:hover{background:rgba(255,255,255,0.08);}
- .person-btn.active{background:var(--gold-soft); color:#3A2C10;}
- .person-btn.active .role{color:#7A5A18;}
- .person-btn .lock{margin-left:auto; font-size:12px; opacity:.8;}
+  .section-label{font-size:11px; color:#8CA0AF; text-transform:uppercase; letter-spacing:.05em; margin:0 0 4px 4px;}
+  .person-list{display:flex; flex-direction:column; gap:5px;}
+  .person-btn{
+    text-align:left; background:transparent; border:1px solid transparent; color:#D6DCE1;
+    padding:8px 9px; border-radius:9px; cursor:pointer; font-size:13.5px; display:flex; align-items:center; gap:9px;
+    width:100%;
+  }
+  .person-btn .role{font-size:11px; color:#8CA0AF; display:block;}
+  .person-btn:hover{background:rgba(255,255,255,0.08);}
+  .person-btn.active{background:var(--gold-soft); color:#3A2C10;}
+  .person-btn.active .role{color:#7A5A18;}
+  .person-btn .lock{margin-left:auto; font-size:12px; opacity:.8;}
 
- .avatar{
- width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
- font-size:12.5px; font-weight:700; color:#fff; background:var(--accent); overflow:hidden;
- }
- .avatar img{width:100%; height:100%; object-fit:cover;}
- .avatar.lg{width:44px; height:44px; font-size:16px;}
- .avatar.xl{width:72px; height:72px; font-size:24px;}
+  .avatar{
+    width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:700; color:#fff; background:var(--accent); overflow:hidden;
+  }
+  .avatar img{width:100%; height:100%; object-fit:cover;}
+  .avatar.lg{width:44px; height:44px; font-size:16px;}
+  .avatar.xl{width:72px; height:72px; font-size:24px;}
 
- .logout-btn{margin-top:auto; text-align:left; background:transparent; border:none; color:#E7A6A0; padding:10px 12px; border-radius:9px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:10px;}
- .logout-btn:hover{background:rgba(255,255,255,0.08);}
+  .logout-btn{margin-top:auto; text-align:left; background:transparent; border:none; color:#E7A6A0; padding:10px 12px; border-radius:9px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:10px;}
+  .logout-btn:hover{background:rgba(255,255,255,0.08);}
 
- /* Top bar */
- .topbar{
- height:96px; flex-shrink:0; position:relative; overflow:hidden;
- background:linear-gradient(100deg, rgba(19,42,76,0.88), rgba(28,61,110,0.55)), var(--ink) center/cover;
- display:flex; align-items:center; justify-content:space-between; padding:0 28px; color:#fff;
- }
- .topbar-right{display:flex; align-items:center; gap:20px; z-index:2;}
- .topbar-clock{font-size:13px; text-align:right; line-height:1.5;}
- .topbar-clock .row{display:flex; align-items:center; gap:6px; justify-content:flex-end; white-space:nowrap;}
- .topbar-user{display:flex; align-items:center; gap:10px; cursor:pointer;}
- .topbar-user .name{font-size:14px; font-weight:600;}
- .topbar-user .role{font-size:11.5px; color:#D8E0EA;}
+  /* Top bar */
+  .topbar{
+    height:96px; flex-shrink:0; position:relative; overflow:hidden;
+    background:linear-gradient(100deg, rgba(19,42,76,0.88), rgba(28,61,110,0.55)), var(--ink) center/cover;
+    display:flex; align-items:center; justify-content:space-between; padding:0 28px; color:#fff;
+  }
+  .topbar-right{display:flex; align-items:center; gap:20px; z-index:2;}
+  .topbar-clock{font-size:13px; text-align:right; line-height:1.5;}
+  .topbar-clock .row{display:flex; align-items:center; gap:6px; justify-content:flex-end; white-space:nowrap;}
+  .topbar-user{display:flex; align-items:center; gap:10px; cursor:pointer;}
+  .topbar-user .name{font-size:14px; font-weight:600;}
+  .topbar-user .role{font-size:11.5px; color:#D8E0EA;}
 
- /* Main */
- .main-scroll{flex:1; display:flex; flex-direction:column; min-width:0;}
- .main{flex:1; padding:28px 36px 40px; max-width:1080px; width:100%;}
- .view-title{margin-bottom:20px; display:flex; align-items:center; gap:12px;}
- .view-title .badge-ico{width:42px; height:42px; border-radius:11px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;}
- .view-title h2{font-size:22px;}
- .view-title p{margin:4px 0 0; color:var(--ink-soft); font-size:13.5px;}
+  /* Main */
+  .main-scroll{flex:1; display:flex; flex-direction:column; min-width:0;}
+  .main{flex:1; padding:28px 36px 40px; max-width:1080px; width:100%;}
+  .view-title{margin-bottom:20px; display:flex; align-items:center; gap:12px;}
+  .view-title .badge-ico{width:42px; height:42px; border-radius:11px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;}
+  .view-title h2{font-size:22px;}
+  .view-title p{margin:4px 0 0; color:var(--ink-soft); font-size:13.5px;}
 
- .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; margin-bottom:20px; box-shadow:0 1px 3px rgba(20,40,70,0.04);}
- .row{display:flex; gap:16px; flex-wrap:wrap;}
- .field{display:flex; flex-direction:column; gap:5px; margin-bottom:14px;}
- .field label{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
- input[type=date], input[type=time], input[type=text], input[type=password], input[type=number], select, textarea{
- font-family:inherit; font-size:14.5px; padding:9px 11px; border:1px solid var(--line); border-radius:8px;
- background:#FCFCFD; color:var(--ink);
- }
- input:focus, select:focus, textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
- textarea{resize:vertical; min-height:52px;}
- .toggle-group{display:flex; gap:8px;}
- .toggle-btn{
- padding:8px 16px; border-radius:8px; border:1px solid var(--line); background:#FCFCFD; cursor:pointer; font-size:14px; color:var(--ink-soft);
- }
- .toggle-btn.active-work{background:var(--ok-soft); border-color:var(--ok); color:var(--ok); font-weight:600;}
- .toggle-btn.active-libur{background:var(--libur-soft); border-color:var(--libur); color:var(--libur); font-weight:600;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; margin-bottom:20px; box-shadow:0 1px 3px rgba(20,40,70,0.04);}
+  .row{display:flex; gap:16px; flex-wrap:wrap;}
+  .field{display:flex; flex-direction:column; gap:5px; margin-bottom:14px;}
+  .field label{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
+  input[type=date], input[type=time], input[type=text], input[type=password], input[type=number], select, textarea{
+    font-family:inherit; font-size:14.5px; padding:9px 11px; border:1px solid var(--line); border-radius:8px;
+    background:#FCFCFD; color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea{resize:vertical; min-height:52px;}
+  .toggle-group{display:flex; gap:8px;}
+  .toggle-btn{
+    padding:8px 16px; border-radius:8px; border:1px solid var(--line); background:#FCFCFD; cursor:pointer; font-size:14px; color:var(--ink-soft);
+  }
+  .toggle-btn.active-work{background:var(--ok-soft); border-color:var(--ok); color:var(--ok); font-weight:600;}
+  .toggle-btn.active-libur{background:var(--libur-soft); border-color:var(--libur); color:var(--libur); font-weight:600;}
 
- .kegiatan-item{display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;}
- .kegiatan-item .num{padding-top:9px; font-size:13px; color:var(--ink-soft); width:18px; flex-shrink:0;}
- .kegiatan-item textarea{flex:1;}
- .icon-btn{
- background:transparent; border:none; color:var(--ink-soft); cursor:pointer; font-size:16px; padding:6px 8px; border-radius:6px;
- }
- .icon-btn:hover{background:#F0F0EC; color:var(--libur);}
- .add-link{
- background:transparent; border:1px dashed var(--line); color:var(--accent); padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13.5px; margin-top:4px;
- }
- .add-link:hover{background:var(--accent-soft);}
+  .kegiatan-item{display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;}
+  .kegiatan-item .num{padding-top:9px; font-size:13px; color:var(--ink-soft); width:18px; flex-shrink:0;}
+  .kegiatan-item textarea{flex:1;}
+  .icon-btn{
+    background:transparent; border:none; color:var(--ink-soft); cursor:pointer; font-size:16px; padding:6px 8px; border-radius:6px;
+  }
+  .icon-btn:hover{background:#F0F0EC; color:var(--libur);}
+  .add-link{
+    background:transparent; border:1px dashed var(--line); color:var(--accent); padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13.5px; margin-top:4px;
+  }
+  .add-link:hover{background:var(--accent-soft);}
 
- .btn-primary{
- background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:9px; cursor:pointer; font-size:14.5px; font-weight:600;
- }
- .btn-primary:hover{background:#255ac2;}
- .btn-secondary{
- background:#fff; color:var(--ink); border:1px solid var(--line); padding:9px 16px; border-radius:9px; cursor:pointer; font-size:14px;
- }
- .btn-secondary:hover{background:#F5F7FA;}
+  .btn-primary{
+    background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:9px; cursor:pointer; font-size:14.5px; font-weight:600;
+  }
+  .btn-primary:hover{background:#255ac2;}
+  .btn-secondary{
+    background:#fff; color:var(--ink); border:1px solid var(--line); padding:9px 16px; border-radius:9px; cursor:pointer; font-size:14px;
+  }
+  .btn-secondary:hover{background:#F5F7FA;}
 
- .search-box{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:24px; padding:9px 16px; flex:1; min-width:180px;}
- .search-box input{border:none; outline:none; font-size:14px; flex:1; background:transparent; padding:0;}
+  .search-box{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:24px; padding:9px 16px; flex:1; min-width:180px;}
+  .search-box input{border:none; outline:none; font-size:14px; flex:1; background:transparent; padding:0;}
 
- table{width:100%; border-collapse:separate; border-spacing:0; font-size:14px;}
- th{text-align:left; font-size:11.5px; color:var(--ink); text-transform:uppercase; letter-spacing:0.04em; border-bottom:2px solid var(--accent); padding:12px 10px; font-weight:700; background:var(--header-bg);}
- th .ico{margin-right:6px; color:var(--accent);}
- td{padding:12px 10px; border-bottom:1px solid #EEF0F4; vertical-align:top;}
- tbody tr{position:relative;}
- tbody tr td:first-child{box-shadow: inset 3px 0 0 0 var(--rowbar, var(--accent));}
- tbody tr:hover, tbody tr.row-even:hover{background:#E9F0FC;}
- .tag{display:inline-block; padding:3px 11px; border-radius:20px; font-size:12px; font-weight:600;}
- .tag.kerja{background:var(--ok-soft); color:var(--ok);}
- .tag.libur{background:var(--libur-soft); color:var(--libur);}
- .kegiatan-preview{white-space:pre-line; color:var(--ink-soft); font-size:13.5px; max-width:420px;}
- .row-actions{display:flex; gap:6px;}
- .row-actions button{font-size:12.5px; padding:6px 12px; border-radius:7px; border:1px solid var(--line); background:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:5px;}
- .row-actions button.edit{color:var(--accent); border-color:var(--accent-soft);}
- .row-actions button.del{color:var(--libur); border-color:var(--libur-soft);}
- .row-actions button:hover{filter:brightness(0.97);}
+  table{width:100%; border-collapse:separate; border-spacing:0; font-size:14px;}
+  th{text-align:left; font-size:11.5px; color:var(--ink); text-transform:uppercase; letter-spacing:0.04em; border-bottom:2px solid var(--accent); padding:12px 10px; font-weight:700; background:var(--header-bg);}
+  th .ico{margin-right:6px; color:var(--accent);}
+  td{padding:12px 10px; border-bottom:1px solid #EEF0F4; vertical-align:top;}
+  tbody tr{position:relative;}
+  tbody tr td:first-child{box-shadow: inset 3px 0 0 0 var(--rowbar, var(--accent));}
+  tbody tr:hover, tbody tr.row-even:hover{background:#E9F0FC;}
+  .tag{display:inline-block; padding:3px 11px; border-radius:20px; font-size:12px; font-weight:600;}
+  .tag.kerja{background:var(--ok-soft); color:var(--ok);}
+  .tag.libur{background:var(--libur-soft); color:var(--libur);}
+  .kegiatan-preview{white-space:pre-line; color:var(--ink-soft); font-size:13.5px; max-width:420px;}
+  .row-actions{display:flex; gap:6px;}
+  .row-actions button{font-size:12.5px; padding:6px 12px; border-radius:7px; border:1px solid var(--line); background:#fff; cursor:pointer; display:inline-flex; align-items:center; gap:5px;}
+  .row-actions button.edit{color:var(--accent); border-color:var(--accent-soft);}
+  .row-actions button.del{color:var(--libur); border-color:var(--libur-soft);}
+  .row-actions button:hover{filter:brightness(0.97);}
 
- .toast{
- position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
- background:var(--ink); color:#fff; padding:11px 20px; border-radius:8px; font-size:14px;
- opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:2000;
- }
- .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:11px 20px; border-radius:8px; font-size:14px;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:2000;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
 
- .empty{color:var(--ink-soft); font-size:14px; padding:18px 0;}
- .month-nav{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
- .sticky-subheader{position:sticky; top:0; background:var(--paper); z-index:20; padding-top:28px; margin-top:-28px; padding-bottom:14px;}
- table thead th{position:sticky; top:var(--thead-top, 0px); z-index:10; box-shadow:0 2px 0 var(--accent);}
- tbody tr.row-even{background:#FAFBFD;}
- .month-nav select{min-width:130px;}
+  .empty{color:var(--ink-soft); font-size:14px; padding:18px 0;}
+  .month-nav{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .sticky-subheader{position:sticky; top:0; background:var(--paper); z-index:20; padding-top:28px; margin-top:-28px; padding-bottom:14px;}
+  table thead th{position:sticky; top:var(--thead-top, 0px); z-index:10; box-shadow:0 2px 0 var(--accent);}
+  tbody tr.row-even{background:#FAFBFD;}
+  .month-nav select{min-width:130px;}
 
- .team-card{display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #EEF0F4; gap:10px;}
- .team-card:last-child{border-bottom:none;}
- .team-card .meta{font-size:13px; color:var(--ink-soft);}
- .progress-bar{width:130px; height:6px; background:#EDEDE8; border-radius:6px; overflow:hidden; margin-top:6px;}
- .progress-fill{height:100%; background:var(--accent);}
+  .team-card{display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #EEF0F4; gap:10px;}
+  .team-card:last-child{border-bottom:none;}
+  .team-card .meta{font-size:13px; color:var(--ink-soft);}
+  .progress-bar{width:130px; height:6px; background:#EDEDE8; border-radius:6px; overflow:hidden; margin-top:6px;}
+  .progress-fill{height:100%; background:var(--accent);}
 
- .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:20px;}
- .stat-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px;}
- .stat-card .num{font-size:26px; font-weight:700; color:var(--ink);}
- .stat-card .label{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
- .cta-banner{background:linear-gradient(120deg, var(--ink), var(--ink2)); color:#fff; border-radius:var(--radius); padding:24px 26px; display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
- .cta-banner h3{color:#fff; font-size:19px;}
- .cta-banner p{margin:6px 0 0; color:#D8E0EA; font-size:13.5px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:20px;}
+  .stat-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px;}
+  .stat-card .num{font-size:26px; font-weight:700; color:var(--ink);}
+  .stat-card .label{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .cta-banner{background:linear-gradient(120deg, var(--ink), var(--ink2)); color:#fff; border-radius:var(--radius); padding:24px 26px; display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
+  .cta-banner h3{color:#fff; font-size:19px;}
+  .cta-banner p{margin:6px 0 0; color:#D8E0EA; font-size:13.5px;}
 
- @media (max-width: 900px){
- .app{flex-direction:column;}
- .sidebar{width:100%; position:relative; height:auto;}
- .main{padding:20px 16px;}
- .topbar{height:auto; flex-direction:column; align-items:flex-start; gap:10px; padding:16px;}
- .topbar-right{width:100%; flex-wrap:wrap; justify-content:space-between;}
- .row{flex-direction:column;}
- .field{width:100%;}
- .stat-grid{grid-template-columns:1fr;}
- .team-card{flex-wrap:wrap;}
- }
+  @media (max-width: 900px){
+    .app{flex-direction:column;}
+    .sidebar{width:100%; position:relative; height:auto;}
+    .main{padding:20px 16px;}
+    .topbar{height:auto; flex-direction:column; align-items:flex-start; gap:10px; padding:16px;}
+    .topbar-right{width:100%; flex-wrap:wrap; justify-content:space-between;}
+    .row{flex-direction:column;}
+    .field{width:100%;}
+    .stat-grid{grid-template-columns:1fr;}
+    .team-card{flex-wrap:wrap;}
+  }
 
- /* Layar HP: tabel Riwayat berubah jadi kartu bertumpuk supaya tidak perlu di-zoom */
- @media (max-width: 640px){
- .month-nav{flex-direction:column; align-items:stretch;}
- .month-nav select{width:100%;}
- .search-box{width:100%;}
- table{border:none;}
- table thead{display:none;}
- table tbody tr{
- display:block; margin-bottom:14px; border:1px solid var(--line); border-radius:var(--radius);
- box-shadow:0 1px 3px rgba(20,40,70,0.04); overflow:hidden; background:var(--card) !important;
- }
- table tbody tr td:first-child{box-shadow:none; border-top:4px solid var(--rowbar, var(--accent));}
- table td{
- display:block; text-align:left; padding:10px 14px; border-bottom:1px solid #EEF0F4;
- }
- table td:last-child{border-bottom:none;}
- table td[data-label]::before{
- content:attr(data-label); display:block; font-size:10.5px; font-weight:700; text-transform:uppercase;
- letter-spacing:.04em; color:var(--ink-soft); margin-bottom:3px;
- }
- table td.row-actions{display:flex; gap:8px;}
- table td.row-actions::before{width:100%;}
- .kegiatan-preview{max-width:100%;}
- .view-title{flex-wrap:wrap;}
- .cta-banner{flex-direction:column; align-items:flex-start;}
- .cta-banner button{width:100%;}
- }
+  /* Layar HP: tabel Riwayat berubah jadi kartu bertumpuk supaya tidak perlu di-zoom */
+  @media (max-width: 640px){
+    .month-nav{flex-direction:column; align-items:stretch;}
+    .month-nav select{width:100%;}
+    .search-box{width:100%;}
+    table{border:none;}
+    table thead{display:none;}
+    table tbody tr{
+      display:block; margin-bottom:14px; border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:0 1px 3px rgba(20,40,70,0.04); overflow:hidden; background:var(--card) !important;
+    }
+    table tbody tr td:first-child{box-shadow:none; border-top:4px solid var(--rowbar, var(--accent));}
+    table td{
+      display:block; text-align:left; padding:10px 14px; border-bottom:1px solid #EEF0F4;
+    }
+    table td:last-child{border-bottom:none;}
+    table td[data-label]::before{
+      content:attr(data-label); display:block; font-size:10.5px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.04em; color:var(--ink-soft); margin-bottom:3px;
+    }
+    table td.row-actions{display:flex; gap:8px;}
+    table td.row-actions::before{width:100%;}
+    .kegiatan-preview{max-width:100%;}
+    .view-title{flex-wrap:wrap;}
+    .cta-banner{flex-direction:column; align-items:flex-start;}
+    .cta-banner button{width:100%;}
+  }
 </style>
 </head>
 <body>
 <div class="app">
- <div class="sidebar">
- <div class="brand">
- <div class="brand-icon"></div>
- <div>
- <h1>Rekap Kerja Harian</h1>
- <p>Tim IT DPRD Kab. Langkat</p>
- </div>
- </div>
- <nav class="tabs" id="tabNav"></nav>
- <hr>
- <div>
- <div class="section-label">Anda login sebagai</div>
- <div id="currentPersonCard"></div>
- </div>
- <div>
- <div class="section-label">Role &amp; Akses</div>
- <div class="person-list" id="personList"></div>
- </div>
- <button class="logout-btn" id="btn-logout-side" style="display:none;"><span class="ico"></span> Keluar</button>
- </div>
- <div class="main-scroll">
- <div class="topbar" id="topbar">
- <div></div>
- <div class="topbar-right">
- <div class="topbar-clock" id="topbarClock"></div>
- <div class="topbar-user" id="topbarUser"></div>
- </div>
- </div>
- <div class="main" id="main"></div>
- </div>
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">&#128203;</div>
+      <div>
+        <h1>Rekap Kerja Harian</h1>
+        <p>Tim IT DPRD Kab. Langkat</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabNav"></nav>
+    <hr>
+    <div>
+      <div class="section-label">Anda login sebagai</div>
+      <div id="currentPersonCard"></div>
+    </div>
+    <div>
+      <div class="section-label">Role &amp; Akses</div>
+      <div class="person-list" id="personList"></div>
+    </div>
+    <button class="logout-btn" id="btn-logout-side" style="display:none;"><span class="ico">&#8617;</span> Keluar</button>
+  </div>
+  <div class="main-scroll">
+    <div class="topbar" id="topbar">
+      <div></div>
+      <div class="topbar-right">
+        <div class="topbar-clock" id="topbarClock"></div>
+        <div class="topbar-user" id="topbarUser"></div>
+      </div>
+    </div>
+    <div class="main" id="main"></div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
-
 <script>
 /* ---------------- KONFIGURASI ---------------- */
-// GANTI baris di bawah ini dengan URL Web App Google Apps Script Anda setelah proses deploy.
-// Lihat PANDUAN-SETUP.md langkah 4.
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyi69I5G80gWzGxrwLw80Z4VGyRAOPeM-UXQL-BEACu0eA94azQBZ3ZeyJmDGWWhG-tQw/exec';
 
 /* ---------------- DATA MODEL ---------------- */
-// Daftar anggota tim TIDAK lagi ditulis di sini - diambil otomatis dari sheet "Anggota" di Google Sheets.
-// Untuk tambah/kurangi anggota, cukup edit sheet "Anggota", tidak perlu ubah file ini.
 let PEOPLE = [];
 let BANNER_URL = '';
 const AVATAR_COLORS = ['#2F6FE4','#1D8A55','#B8863B','#7C3AED','#D0463C','#0891B2'];
@@ -283,962 +278,977 @@ const HARI_NAMA = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const BULAN_NAMA = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
 function initials(nama){
- const parts = (nama||'').trim().split(/\s+/).filter(Boolean);
- if(parts.length===0) return '?';
- if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
- return (parts[0][0]+parts[1][0]).toUpperCase();
+  const parts = (nama||'').trim().split(' ').filter(Boolean);
+  if(parts.length===0) return '?';
+  if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
 }
 function colorFor(id){
- let h=0; for(let i=0;i<id.length;i++) h = (h*31 + id.charCodeAt(i)) >>> 0;
- return AVATAR_COLORS[h % AVATAR_COLORS.length];
+  let h=0; for(let i=0;i<id.length;i++) h = (h*31 + id.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
 function avatarHtml(person, sizeClass){
- const cls = 'avatar' + (sizeClass?' '+sizeClass:'');
- if(person.avatarUrl){
- return `<div class="${cls}"><img src="${person.avatarUrl}" alt=""></div>`;
- }
- return `<div class="${cls}" style="background:${colorFor(person.id)}">${initials(person.nama)}</div>`;
+  const cls = 'avatar' + (sizeClass?' '+sizeClass:'');
+  if(person.avatarUrl){
+    return `<div class="${cls}"><img src="${person.avatarUrl}" alt=""></div>`;
+  }
+  return `<div class="${cls}" style="background:${colorFor(person.id)}">${initials(person.nama)}</div>`;
 }
 
 let state = {
- personId: null,
- tab: 'beranda',
- historyMonth: new Date().getMonth()+1,
- historyYear: new Date().getFullYear(),
- editingKey: null, // when editing an existing entry
- unlocked: new Set(), // person ids unlocked with correct PIN this session
+  personId: null,
+  tab: 'beranda',
+  historyMonth: new Date().getMonth()+1,
+  historyYear: new Date().getFullYear(),
+  editingKey: null,
+  unlocked: new Set(),
 };
 
 function currentPerson(){ return PEOPLE.find(p=>p.id===state.personId) || null; }
 
 async function trySwitchPerson(personId){
- if(state.unlocked.has(personId)){
- state.personId = personId;
- state.tab = 'beranda';
- state.editingKey = null;
- render();
- return;
- }
- const p = PEOPLE.find(x=>x.id===personId);
- showPinModal(p, async (entered)=>{
- if(!storageReady()){
- showToast('Aplikasi belum disambungkan ke Google Sheets. Lihat PANDUAN-SETUP.md');
- return;
- }
- try{
- const data = await callServer('apiCheckPin', personId, entered.trim());
- if(data.ok && data.valid){
- state.unlocked.add(personId);
- state.personId = personId;
- state.tab = 'beranda';
- state.editingKey = null;
- closePinModal();
- render();
- } else {
- showPinModalError('PIN salah. Coba lagi.');
- }
- }catch(e){
- console.error(e);
- showPinModalError('Gagal memeriksa PIN: ' + e.message);
- }
- });
+  if(state.unlocked.has(personId)){
+    state.personId = personId;
+    state.tab = 'beranda';
+    state.editingKey = null;
+    render();
+    return;
+  }
+  const p = PEOPLE.find(x=>x.id===personId);
+  showPinModal(p, async (entered)=>{
+    if(!storageReady()){
+      showToast('Aplikasi belum disambungkan ke Google Sheets.');
+      return;
+    }
+    try{
+      const url = `${WEB_APP_URL}?action=checkpin&personId=${encodeURIComponent(personId)}&pin=${encodeURIComponent(entered.trim())}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if(data.ok && data.valid){
+        state.unlocked.add(personId);
+        state.personId = personId;
+        state.tab = 'beranda';
+        state.editingKey = null;
+        closePinModal();
+        render();
+      } else {
+        showPinModalError('PIN salah. Coba lagi.');
+      }
+    }catch(e){
+      console.error(e);
+      showPinModalError('Gagal memeriksa PIN: ' + e.message);
+    }
+  });
 }
 
 function showPinModal(person, onSubmit){
- closePinModal();
- const overlay = document.createElement('div');
- overlay.id = 'pin-modal-overlay';
- overlay.style.cssText = 'position:fixed; inset:0; background:rgba(20,25,35,0.55); display:flex; align-items:center; justify-content:center; z-index:1000;';
- overlay.innerHTML = `
- <div style="background:var(--card); border-radius:14px; padding:26px 28px; width:300px; max-width:90vw; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
- <h3 style="margin:0 0 6px; font-size:17px;">Masuk sebagai ${person.nama}</h3>
- <p style="margin:0 0 16px; color:var(--ink-soft); font-size:13.5px;">Masukkan PIN Anda</p>
- <input type="password" inputmode="numeric" id="pin-modal-input" style="width:100%; padding:10px 12px; font-size:16px; border:1px solid var(--line); border-radius:8px; letter-spacing:2px; text-align:center;" autofocus>
- <p id="pin-modal-error" style="color:var(--libur); font-size:13px; min-height:18px; margin:8px 0 0;"></p>
- <div style="display:flex; gap:8px; margin-top:10px;">
- <button type="button" class="btn-secondary" id="pin-modal-cancel" style="flex:1;">Batal</button>
- <button type="button" class="btn-primary" id="pin-modal-ok" style="flex:1;">Masuk</button>
- </div>
- </div>
- `;
- document.body.appendChild(overlay);
- const input = overlay.querySelector('#pin-modal-input');
- input.focus();
- const submit = ()=> onSubmit(input.value || '');
- overlay.querySelector('#pin-modal-ok').addEventListener('click', submit);
- overlay.querySelector('#pin-modal-cancel').addEventListener('click', closePinModal);
- input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') submit(); });
- overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closePinModal(); });
+  closePinModal();
+  const overlay = document.createElement('div');
+  overlay.id = 'pin-modal-overlay';
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(20,25,35,0.55); display:flex; align-items:center; justify-content:center; z-index:1000;';
+  overlay.innerHTML = `
+    <div style="background:var(--card); border-radius:14px; padding:26px 28px; width:300px; max-width:90vw; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
+      <h3 style="margin:0 0 6px; font-size:17px;">Masuk sebagai ${person.nama}</h3>
+      <p style="margin:0 0 16px; color:var(--ink-soft); font-size:13.5px;">Masukkan PIN Anda</p>
+      <input type="password" inputmode="numeric" id="pin-modal-input" style="width:100%; padding:10px 12px; font-size:16px; border:1px solid var(--line); border-radius:8px; letter-spacing:2px; text-align:center;" autofocus>
+      <p id="pin-modal-error" style="color:var(--libur); font-size:13px; min-height:18px; margin:8px 0 0;"></p>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button type="button" class="btn-secondary" id="pin-modal-cancel" style="flex:1;">Batal</button>
+        <button type="button" class="btn-primary" id="pin-modal-ok" style="flex:1;">Masuk</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const input = overlay.querySelector('#pin-modal-input');
+  input.focus();
+  const submit = ()=> onSubmit(input.value || '');
+  overlay.querySelector('#pin-modal-ok').addEventListener('click', submit);
+  overlay.querySelector('#pin-modal-cancel').addEventListener('click', closePinModal);
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') submit(); });
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closePinModal(); });
 }
 function showPinModalError(msg){
- const el = document.getElementById('pin-modal-error');
- if(el) el.textContent = msg;
- const input = document.getElementById('pin-modal-input');
- if(input){ input.value=''; input.focus(); }
+  const el = document.getElementById('pin-modal-error');
+  if(el) el.textContent = msg;
+  const input = document.getElementById('pin-modal-input');
+  if(input){ input.value=''; input.focus(); }
 }
 function closePinModal(){
- const el = document.getElementById('pin-modal-overlay');
- if(el) el.remove();
+  const el = document.getElementById('pin-modal-overlay');
+  if(el) el.remove();
 }
 
 function logout(){
- if(state.personId) state.unlocked.delete(state.personId);
- state.personId = null;
- state.tab = 'beranda';
- state.editingKey = null;
- render();
+  if(state.personId) state.unlocked.delete(state.personId);
+  state.personId = null;
+  state.tab = 'beranda';
+  state.editingKey = null;
+  render();
 }
 function pad2(n){ return String(n).padStart(2,'0'); }
 
-/* ---------------- TOP BAR: jam berjalan + banner + profil ---------------- */
 let clockTimer = null;
 function renderTopbar(){
- const topbar = document.getElementById('topbar');
- topbar.style.backgroundImage = BANNER_URL
- ? `linear-gradient(100deg, rgba(19,42,76,0.82), rgba(28,61,110,0.45)), url('${BANNER_URL}')`
- : '';
- topbar.style.backgroundSize = 'cover';
- topbar.style.backgroundPosition = 'center';
+  const topbar = document.getElementById('topbar');
+  topbar.style.backgroundImage = BANNER_URL
+    ? `linear-gradient(100deg, rgba(19,42,76,0.82), rgba(28,61,110,0.45)), url('${BANNER_URL}')`
+    : '';
+  topbar.style.backgroundSize = 'cover';
+  topbar.style.backgroundPosition = 'center';
 
- function tick(){
- const now = new Date();
- const hari = HARI_NAMA[now.getDay()];
- const tgl = `${now.getDate()} ${BULAN_NAMA[now.getMonth()]} ${now.getFullYear()}`;
- const jam = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())} WIB`;
- const clockEl = document.getElementById('topbarClock');
- if(clockEl) clockEl.innerHTML = `<div class="row"> ${hari}, ${tgl}</div><div class="row"> ${jam}</div>`;
- }
- tick();
- clearInterval(clockTimer);
- clockTimer = setInterval(tick, 1000);
+  function tick(){
+    const now = new Date();
+    const hari = HARI_NAMA[now.getDay()];
+    const tgl = `${now.getDate()} ${BULAN_NAMA[now.getMonth()]} ${now.getFullYear()}`;
+    const jam = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())} WIB`;
+    const clockEl = document.getElementById('topbarClock');
+    if(clockEl) clockEl.innerHTML = `<div class="row">${hari}, ${tgl}</div><div class="row">${jam}</div>`;
+  }
+  tick();
+  clearInterval(clockTimer);
+  clockTimer = setInterval(tick, 1000);
 
- const userEl = document.getElementById('topbarUser');
- const p = currentPerson();
- if(p){
- userEl.style.display = 'flex';
- userEl.innerHTML = `${avatarHtml(p)}<div><div class="name">${p.nama}</div><div class="role">${p.jabatan}</div></div>`;
- } else {
- userEl.style.display = 'none';
- }
+  const userEl = document.getElementById('topbarUser');
+  const p = currentPerson();
+  if(p){
+    userEl.style.display = 'flex';
+    userEl.innerHTML = `${avatarHtml(p)}<div><div class="name">${p.nama}</div><div class="role">${p.jabatan}</div></div>`;
+  } else {
+    userEl.style.display = 'none';
+  }
 }
-
 
 function showToast(msg){
- const t = document.getElementById('toast');
- t.textContent = msg;
- t.classList.add('show');
- clearTimeout(showToast._t);
- showToast._t = setTimeout(()=>t.classList.remove('show'), 2200);
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
-/* ---------------- STORAGE HELPERS (via Google Sheets / Apps Script) ---------------- */
+/* ---------------- STORAGE HELPERS (via fetch ke Apps Script) ---------------- */
 function storageReady(){
- return typeof google !== 'undefined' && google.script && google.script.run;
-}
-function callServer(fnName, ...args){
- return new Promise((resolve, reject)=>{
- google.script.run
- .withSuccessHandler(resolve)
- .withFailureHandler(err=>reject(new Error(err && err.message ? err.message : String(err))))
- [fnName](...args);
- });
+  return WEB_APP_URL && WEB_APP_URL.indexOf('https://') === 0;
 }
 async function saveEntry(personId, dateStr, entry){
- if(!storageReady()){ showToast('Aplikasi belum disambungkan. Buka lewat link Web App, bukan file lokal.'); return { success:false, warnings:[] }; }
- try{
- const data = await callServer('apiSave', personId, dateStr, entry);
- if(!data.ok) throw new Error(data.error || 'Gagal menyimpan');
- return { success:true, warnings: data.warnings || [] };
- }catch(e){
- console.error(e);
- showToast('Gagal menyimpan data: ' + e.message);
- return { success:false, warnings:[] };
- }
+  if(!storageReady()){ showToast('Aplikasi belum disambungkan ke Google Sheets.'); return { success:false, warnings:[] }; }
+  try{
+    const res = await fetch(WEB_APP_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'save', personId, dateStr, entry })
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || 'Gagal menyimpan');
+    return { success:true, warnings: data.warnings || [] };
+  }catch(e){
+    console.error(e);
+    showToast('Gagal menyimpan data: ' + e.message);
+    return { success:false, warnings:[] };
+  }
 }
 async function deleteEntry(personId, dateStr){
- if(!storageReady()) return false;
- try{
- const data = await callServer('apiDelete', personId, dateStr);
- return !!data.ok;
- }catch(e){ console.error(e); return false; }
+  if(!storageReady()) return false;
+  try{
+    const res = await fetch(WEB_APP_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'delete', personId, dateStr })
+    });
+    const data = await res.json();
+    return !!data.ok;
+  }catch(e){ console.error(e); return false; }
 }
 async function getEntriesForMonth(personId, year, month){
- if(!storageReady()) return {};
- try{
- const data = await callServer('apiList', personId, year, month);
- if(!data.ok) return {};
- const map = {};
- (data.data || []).forEach(e=>{ map[e.tanggal] = e; });
- return map;
- }catch(e){ console.error(e); return {}; }
+  if(!storageReady()) return {};
+  try{
+    const url = `${WEB_APP_URL}?action=list&personId=${encodeURIComponent(personId)}&year=${year}&month=${month}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.ok) return {};
+    const map = {};
+    (data.data || []).forEach(e=>{ map[e.tanggal] = e; });
+    return map;
+  }catch(e){ console.error(e); return {}; }
 }
 
 /* ---------------- RENDER: SIDEBAR ---------------- */
 function renderSidebar(){
- const list = document.getElementById('personList');
- list.innerHTML = '';
- PEOPLE.forEach(p=>{
- const btn = document.createElement('button');
- btn.className = 'person-btn' + (p.id===state.personId ? ' active':'');
- const lockIcon = state.unlocked.has(p.id) ? '' : '<span style="font-size:10px; opacity:0.7;">(PIN)</span>';
- btn.innerHTML = `${avatarHtml(p)}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.nama}</span><span class="role">${p.jabatan}</span></span><span class="lock">${lockIcon}</span>`;
- btn.onclick = ()=> trySwitchPerson(p.id);
- list.appendChild(btn);
- });
+  const list = document.getElementById('personList');
+  list.innerHTML = '';
+  PEOPLE.forEach(p=>{
+    const btn = document.createElement('button');
+    btn.className = 'person-btn' + (p.id===state.personId ? ' active':'');
+    const lockIcon = state.unlocked.has(p.id) ? '' : '<span style="font-size:10px; opacity:0.7;">(PIN)</span>';
+    btn.innerHTML = `${avatarHtml(p)}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.nama}</span><span class="role">${p.jabatan}</span></span><span class="lock">${lockIcon}</span>`;
+    btn.onclick = ()=> trySwitchPerson(p.id);
+    list.appendChild(btn);
+  });
 
- const currentCard = document.getElementById('currentPersonCard');
- const nav = document.getElementById('tabNav');
- const logoutBtn = document.getElementById('btn-logout-side');
- nav.innerHTML = '';
- if(!currentPerson()){
- currentCard.innerHTML = `<div class="empty" style="color:#8CA0AF; font-size:12.5px;">Belum ada yang login</div>`;
- logoutBtn.style.display = 'none';
- return;
- }
- const p = currentPerson();
- currentCard.innerHTML = `<div class="person-btn active" style="cursor:default;">${avatarHtml(p,'lg')}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;">${p.nama}</span><span class="role">${p.jabatan}</span></span></div>`;
+  const currentCard = document.getElementById('currentPersonCard');
+  const nav = document.getElementById('tabNav');
+  const logoutBtn = document.getElementById('btn-logout-side');
+  nav.innerHTML = '';
+  if(!currentPerson()){
+    currentCard.innerHTML = `<div class="empty" style="color:#8CA0AF; font-size:12.5px;">Belum ada yang login</div>`;
+    logoutBtn.style.display = 'none';
+    return;
+  }
+  const p = currentPerson();
+  currentCard.innerHTML = `<div class="person-btn active" style="cursor:default;">${avatarHtml(p,'lg')}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;">${p.nama}</span><span class="role">${p.jabatan}</span></span></div>`;
 
- const tabs = [
- ['beranda','','Beranda'],
- ['isi','','Isi Laporan'],
- ['riwayat','','Riwayat Laporan Saya'],
- ];
- if(p.isLead) tabs.push(['tim','','Laporan Tim']);
- tabs.push(['pengaturan','','Pengaturan']);
- tabs.forEach(([key,ico,label])=>{
- const b = document.createElement('button');
- b.innerHTML = `<span class="ico">${ico}</span> ${label}`;
- b.className = state.tab===key ? 'active' : '';
- b.onclick = ()=>{ state.tab=key; state.editingKey=null; render(); };
- nav.appendChild(b);
- });
+  const tabs = [
+    ['beranda','','Beranda'],
+    ['isi','','Isi Laporan'],
+    ['riwayat','','Riwayat Laporan Saya'],
+  ];
+  if(p.isLead) tabs.push(['tim','','Laporan Tim']);
+  tabs.push(['pengaturan','','Pengaturan']);
+  tabs.forEach(([key,ico,label])=>{
+    const b = document.createElement('button');
+    b.innerHTML = `<span class="ico">${ico}</span> ${label}`;
+    b.className = state.tab===key ? 'active' : '';
+    b.onclick = ()=>{ state.tab=key; state.editingKey=null; render(); };
+    nav.appendChild(b);
+  });
 
- logoutBtn.style.display = 'flex';
- logoutBtn.onclick = ()=> logout();
+  logoutBtn.style.display = 'flex';
+  logoutBtn.onclick = ()=> logout();
 }
 
 /* ---------------- FORM STATE (Isi Laporan) ---------------- */
 let form = {
- tanggal: new Date().toISOString().slice(0,10),
- jenis: 'kerja', // 'kerja' | 'libur'
- jamMulai: '08.00',
- jamSelesai: '17.00',
- kegiatan: [''],
- keteranganLibur: 'LIBUR',
- fotoExisting: [], // array {fileId, url} - foto lama yang sudah tersimpan
- fotoNewBase64: [], // array base64 - foto baru yang mau ditambahkan
+  tanggal: new Date().toISOString().slice(0,10),
+  jenis: 'kerja',
+  jamMulai: '08.00',
+  jamSelesai: '17.00',
+  kegiatan: [''],
+  keteranganLibur: 'LIBUR',
+  fotoExisting: [],
+  fotoNewBase64: [],
 };
 function resetForm(dateStr){
- form = {
- tanggal: dateStr || new Date().toISOString().slice(0,10),
- jenis: 'kerja',
- jamMulai: '08.00',
- jamSelesai: '17.00',
- kegiatan: [''],
- keteranganLibur: 'LIBUR',
- fotoExisting: [],
- fotoNewBase64: [],
- };
- state.editingKey = null;
+  form = {
+    tanggal: dateStr || new Date().toISOString().slice(0,10),
+    jenis: 'kerja',
+    jamMulai: '08.00',
+    jamSelesai: '17.00',
+    kegiatan: [''],
+    keteranganLibur: 'LIBUR',
+    fotoExisting: [],
+    fotoNewBase64: [],
+  };
+  state.editingKey = null;
 }
 
-/* Compress an image file to a small base64 JPEG so it fits comfortably in storage */
 function compressImageFile(file){
- return new Promise((resolve, reject)=>{
- const reader = new FileReader();
- reader.onerror = ()=> reject(new Error('Gagal membaca file'));
- reader.onload = (e)=>{
- const img = new Image();
- img.onerror = ()=> reject(new Error('File bukan gambar yang valid'));
- img.onload = ()=>{
- const maxDim = 1000;
- let { width, height } = img;
- if(width > maxDim || height > maxDim){
- if(width > height){ height = Math.round(height * (maxDim/width)); width = maxDim; }
- else { width = Math.round(width * (maxDim/height)); height = maxDim; }
- }
- const canvas = document.createElement('canvas');
- canvas.width = width; canvas.height = height;
- const ctx = canvas.getContext('2d');
- ctx.drawImage(img, 0, 0, width, height);
- const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
- resolve(dataUrl);
- };
- img.src = e.target.result;
- };
- reader.readAsDataURL(file);
- });
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = ()=> reject(new Error('Gagal membaca file'));
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onerror = ()=> reject(new Error('File bukan gambar yang valid'));
+      img.onload = ()=>{
+        const maxDim = 1000;
+        let { width, height } = img;
+        if(width > maxDim || height > maxDim){
+          if(width > height){ height = Math.round(height * (maxDim/width)); width = maxDim; }
+          else { width = Math.round(width * (maxDim/height)); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function renderIsiLaporan(container){
- const p = currentPerson();
- const wrap = document.createElement('div');
+  const p = currentPerson();
+  const wrap = document.createElement('div');
 
- wrap.innerHTML = `
- <div class="view-title">
- <div class="badge-ico"></div>
- <div><h2>Isi Laporan Harian</h2>
- <p>Diisi sebagai <strong>${p.nama}</strong> - ${p.jabatan}</p></div>
- </div>
- `;
+  wrap.innerHTML = `
+    <div class="view-title">
+      <div class="badge-ico"></div>
+      <div><h2>Isi Laporan Harian</h2>
+      <p>Diisi sebagai <strong>${p.nama}</strong> - ${p.jabatan}</p></div>
+    </div>
+  `;
 
- const card = document.createElement('div');
- card.className = 'card';
+  const card = document.createElement('div');
+  card.className = 'card';
 
- const rowTop = document.createElement('div');
- rowTop.className = 'row';
- rowTop.innerHTML = `
- <div class="field">
- <label>Tanggal</label>
- <input type="date" id="f-tanggal" value="${form.tanggal}">
- </div>
- <div class="field">
- <label>Jenis Hari</label>
- <div class="toggle-group">
- <button type="button" class="toggle-btn ${form.jenis==='kerja'?'active-work':''}" id="btn-kerja">Hari Kerja</button>
- <button type="button" class="toggle-btn ${form.jenis==='libur'?'active-libur':''}" id="btn-libur">Libur</button>
- </div>
- </div>
- `;
- card.appendChild(rowTop);
+  const rowTop = document.createElement('div');
+  rowTop.className = 'row';
+  rowTop.innerHTML = `
+    <div class="field">
+      <label>Tanggal</label>
+      <input type="date" id="f-tanggal" value="${form.tanggal}">
+    </div>
+    <div class="field">
+      <label>Jenis Hari</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn ${form.jenis==='kerja'?'active-work':''}" id="btn-kerja">Hari Kerja</button>
+        <button type="button" class="toggle-btn ${form.jenis==='libur'?'active-libur':''}" id="btn-libur">Libur</button>
+      </div>
+    </div>
+  `;
+  card.appendChild(rowTop);
 
- const bodyArea = document.createElement('div');
- bodyArea.id = 'form-body';
- card.appendChild(bodyArea);
+  const bodyArea = document.createElement('div');
+  bodyArea.id = 'form-body';
+  card.appendChild(bodyArea);
 
- const saveRow = document.createElement('div');
- saveRow.style.marginTop = '18px';
- saveRow.style.display = 'flex';
- saveRow.style.gap = '10px';
- saveRow.innerHTML = `<button class="btn-primary" id="btn-save">Simpan Laporan</button>
- ${state.editingKey ? '<button class="btn-secondary" id="btn-cancel-edit">Batal Edit</button>' : ''}`;
- card.appendChild(saveRow);
+  const saveRow = document.createElement('div');
+  saveRow.style.marginTop = '18px';
+  saveRow.style.display = 'flex';
+  saveRow.style.gap = '10px';
+  saveRow.innerHTML = `<button class="btn-primary" id="btn-save">Simpan Laporan</button>
+    ${state.editingKey ? '<button class="btn-secondary" id="btn-cancel-edit">Batal Edit</button>' : ''}`;
+  card.appendChild(saveRow);
 
- wrap.appendChild(card);
- container.appendChild(wrap);
+  wrap.appendChild(card);
+  container.appendChild(wrap);
 
- function renderBody(){
- bodyArea.innerHTML = '';
- if(form.jenis === 'kerja'){
- const jamRow = document.createElement('div');
- jamRow.className = 'row';
- jamRow.innerHTML = `
- <div class="field">
- <label>Jam Mulai</label>
- <input type="text" id="f-jammulai" value="${form.jamMulai}" placeholder="08.00" style="width:110px">
- </div>
- <div class="field">
- <label>Jam Selesai</label>
- <input type="text" id="f-jamselesai" value="${form.jamSelesai}" placeholder="17.00" style="width:110px">
- </div>
- `;
- bodyArea.appendChild(jamRow);
+  function renderBody(){
+    bodyArea.innerHTML = '';
+    if(form.jenis === 'kerja'){
+      const jamRow = document.createElement('div');
+      jamRow.className = 'row';
+      jamRow.innerHTML = `
+        <div class="field">
+          <label>Jam Mulai</label>
+          <input type="text" id="f-jammulai" value="${form.jamMulai}" placeholder="08.00" style="width:110px">
+        </div>
+        <div class="field">
+          <label>Jam Selesai</label>
+          <input type="text" id="f-jamselesai" value="${form.jamSelesai}" placeholder="17.00" style="width:110px">
+        </div>
+      `;
+      bodyArea.appendChild(jamRow);
 
- const keg = document.createElement('div');
- keg.className = 'field';
- keg.innerHTML = `<label>Kegiatan (tambahkan tiap poin kegiatan)</label>`;
- const list = document.createElement('div');
- list.id = 'kegiatan-list';
- keg.appendChild(list);
- const addBtn = document.createElement('button');
- addBtn.type = 'button';
- addBtn.className = 'add-link';
- addBtn.textContent = '+ Tambah poin kegiatan';
- addBtn.onclick = ()=>{ form.kegiatan.push(''); renderKegiatanList(); };
- keg.appendChild(addBtn);
- bodyArea.appendChild(keg);
+      const keg = document.createElement('div');
+      keg.className = 'field';
+      keg.innerHTML = `<label>Kegiatan (tambahkan tiap poin kegiatan)</label>`;
+      const list = document.createElement('div');
+      list.id = 'kegiatan-list';
+      keg.appendChild(list);
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'add-link';
+      addBtn.textContent = '+ Tambah poin kegiatan';
+      addBtn.onclick = ()=>{ form.kegiatan.push(''); renderKegiatanList(); };
+      keg.appendChild(addBtn);
+      bodyArea.appendChild(keg);
 
- const MAX_FOTO = 12;
- const fotoField = document.createElement('div');
- fotoField.className = 'field';
- fotoField.innerHTML = `
- <label>Foto Bukti Kegiatan (opsional, boleh lebih dari satu)</label>
- <input type="file" id="f-foto" accept="image/*" multiple>
- <div id="foto-preview" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;"></div>
- `;
- bodyArea.appendChild(fotoField);
- const fotoPreview = fotoField.querySelector('#foto-preview');
- function totalFotoCount(){ return form.fotoExisting.length + form.fotoNewBase64.length; }
- function renderFotoPreview(){
- fotoPreview.innerHTML = '';
- form.fotoExisting.forEach((f,idx)=>{
- const box = document.createElement('div');
- box.style.position = 'relative';
- box.innerHTML = `
- <img src="${f.url}" style="width:74px; height:74px; object-fit:cover; border-radius:6px; border:1px solid var(--line);">
- <button type="button" data-rm-existing="${idx}" class="icon-btn" style="position:absolute; top:-6px; right:-6px; background:#fff; border:1px solid var(--line); border-radius:50%; width:22px; height:22px; padding:0; line-height:1;">&times;</button>
- `;
- fotoPreview.appendChild(box);
- });
- form.fotoNewBase64.forEach((b64,idx)=>{
- const box = document.createElement('div');
- box.style.position = 'relative';
- box.innerHTML = `
- <img src="${b64}" style="width:74px; height:74px; object-fit:cover; border-radius:6px; border:1px solid var(--line);">
- <button type="button" data-rm-new="${idx}" class="icon-btn" style="position:absolute; top:-6px; right:-6px; background:#fff; border:1px solid var(--line); border-radius:50%; width:22px; height:22px; padding:0; line-height:1;">&times;</button>
- `;
- fotoPreview.appendChild(box);
- });
- fotoPreview.querySelectorAll('[data-rm-existing]').forEach(btn=>{
- btn.onclick = ()=>{ form.fotoExisting.splice(+btn.dataset.rmExisting,1); renderFotoPreview(); };
- });
- fotoPreview.querySelectorAll('[data-rm-new]').forEach(btn=>{
- btn.onclick = ()=>{ form.fotoNewBase64.splice(+btn.dataset.rmNew,1); renderFotoPreview(); };
- });
- }
- renderFotoPreview();
- fotoField.querySelector('#f-foto').addEventListener('change', async (e)=>{
- const files = Array.from(e.target.files || []);
- if(files.length === 0) return;
- const sisaSlot = MAX_FOTO - totalFotoCount();
- if(sisaSlot <= 0){ showToast(`Maksimal ${MAX_FOTO} foto per hari`); e.target.value=''; return; }
- const filesToProcess = files.slice(0, sisaSlot);
- if(files.length > filesToProcess.length){ showToast(`Hanya ${filesToProcess.length} foto ditambahkan (maksimal ${MAX_FOTO}/hari)`); }
- for(const file of filesToProcess){
- try{
- const dataUrl = await compressImageFile(file);
- form.fotoNewBase64.push(dataUrl);
- }catch(err){
- showToast('Gagal memproses salah satu foto');
- }
- }
- e.target.value = '';
- renderFotoPreview();
- });
+      const MAX_FOTO = 12;
+      const fotoField = document.createElement('div');
+      fotoField.className = 'field';
+      fotoField.innerHTML = `
+        <label>Foto Bukti Kegiatan (opsional, boleh lebih dari satu)</label>
+        <input type="file" id="f-foto" accept="image/*" multiple>
+        <div id="foto-preview" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;"></div>
+      `;
+      bodyArea.appendChild(fotoField);
+      const fotoPreview = fotoField.querySelector('#foto-preview');
+      function totalFotoCount(){ return form.fotoExisting.length + form.fotoNewBase64.length; }
+      function renderFotoPreview(){
+        fotoPreview.innerHTML = '';
+        form.fotoExisting.forEach((f,idx)=>{
+          const box = document.createElement('div');
+          box.style.position = 'relative';
+          box.innerHTML = `
+            <img src="${f.url}" style="width:74px; height:74px; object-fit:cover; border-radius:6px; border:1px solid var(--line);">
+            <button type="button" data-rm-existing="${idx}" class="icon-btn" style="position:absolute; top:-6px; right:-6px; background:#fff; border:1px solid var(--line); border-radius:50%; width:22px; height:22px; padding:0; line-height:1;">&times;</button>
+          `;
+          fotoPreview.appendChild(box);
+        });
+        form.fotoNewBase64.forEach((b64,idx)=>{
+          const box = document.createElement('div');
+          box.style.position = 'relative';
+          box.innerHTML = `
+            <img src="${b64}" style="width:74px; height:74px; object-fit:cover; border-radius:6px; border:1px solid var(--line);">
+            <button type="button" data-rm-new="${idx}" class="icon-btn" style="position:absolute; top:-6px; right:-6px; background:#fff; border:1px solid var(--line); border-radius:50%; width:22px; height:22px; padding:0; line-height:1;">&times;</button>
+          `;
+          fotoPreview.appendChild(box);
+        });
+        fotoPreview.querySelectorAll('[data-rm-existing]').forEach(btn=>{
+          btn.onclick = ()=>{ form.fotoExisting.splice(+btn.dataset.rmExisting,1); renderFotoPreview(); };
+        });
+        fotoPreview.querySelectorAll('[data-rm-new]').forEach(btn=>{
+          btn.onclick = ()=>{ form.fotoNewBase64.splice(+btn.dataset.rmNew,1); renderFotoPreview(); };
+        });
+      }
+      renderFotoPreview();
+      fotoField.querySelector('#f-foto').addEventListener('change', async (e)=>{
+        const files = Array.from(e.target.files || []);
+        if(files.length === 0) return;
+        const sisaSlot = MAX_FOTO - totalFotoCount();
+        if(sisaSlot <= 0){ showToast(`Maksimal ${MAX_FOTO} foto per hari`); e.target.value=''; return; }
+        const filesToProcess = files.slice(0, sisaSlot);
+        if(files.length > filesToProcess.length){ showToast(`Hanya ${filesToProcess.length} foto ditambahkan (maksimal ${MAX_FOTO}/hari)`); }
+        for(const file of filesToProcess){
+          try{
+            const dataUrl = await compressImageFile(file);
+            form.fotoNewBase64.push(dataUrl);
+          }catch(err){
+            showToast('Gagal memproses salah satu foto');
+          }
+        }
+        e.target.value = '';
+        renderFotoPreview();
+      });
 
- function renderKegiatanList(){
- list.innerHTML = '';
- form.kegiatan.forEach((val, idx)=>{
- const item = document.createElement('div');
- item.className = 'kegiatan-item';
- item.innerHTML = `
- <div class="num">${idx+1}.</div>
- <textarea rows="2" data-idx="${idx}" placeholder="Tuliskan kegiatan...">${val}</textarea>
- ${form.kegiatan.length>1 ? '<button type="button" class="icon-btn" data-remove="'+idx+'">&times;</button>' : ''}
- `;
- list.appendChild(item);
- });
- list.querySelectorAll('textarea').forEach(ta=>{
- ta.addEventListener('input', e=>{
- form.kegiatan[+e.target.dataset.idx] = e.target.value;
- });
- });
- list.querySelectorAll('[data-remove]').forEach(btn=>{
- btn.addEventListener('click', e=>{
- form.kegiatan.splice(+e.target.dataset.remove,1);
- renderKegiatanList();
- });
- });
- }
- renderKegiatanList();
- } else {
- const libRow = document.createElement('div');
- libRow.className = 'field';
- libRow.style.maxWidth = '360px';
- libRow.innerHTML = `
- <label>Keterangan Libur</label>
- <input type="text" id="f-libur" value="${form.keteranganLibur}" placeholder="LIBUR">
- `;
- bodyArea.appendChild(libRow);
- }
- }
- renderBody();
+      function renderKegiatanList(){
+        list.innerHTML = '';
+        form.kegiatan.forEach((val, idx)=>{
+          const item = document.createElement('div');
+          item.className = 'kegiatan-item';
+          item.innerHTML = `
+            <div class="num">${idx+1}.</div>
+            <textarea rows="2" data-idx="${idx}" placeholder="Tuliskan kegiatan...">${val}</textarea>
+            ${form.kegiatan.length>1 ? '<button type="button" class="icon-btn" data-remove="'+idx+'">&times;</button>' : ''}
+          `;
+          list.appendChild(item);
+        });
+        list.querySelectorAll('textarea').forEach(ta=>{
+          ta.addEventListener('input', e=>{
+            form.kegiatan[+e.target.dataset.idx] = e.target.value;
+          });
+        });
+        list.querySelectorAll('[data-remove]').forEach(btn=>{
+          btn.addEventListener('click', e=>{
+            form.kegiatan.splice(+e.target.dataset.remove,1);
+            renderKegiatanList();
+          });
+        });
+      }
+      renderKegiatanList();
+    } else {
+      const libRow = document.createElement('div');
+      libRow.className = 'field';
+      libRow.style.maxWidth = '360px';
+      libRow.innerHTML = `
+        <label>Keterangan Libur</label>
+        <input type="text" id="f-libur" value="${form.keteranganLibur}" placeholder="LIBUR">
+      `;
+      bodyArea.appendChild(libRow);
+    }
+  }
+  renderBody();
 
- wrap.querySelector('#f-tanggal').addEventListener('change', e=>{ form.tanggal = e.target.value; });
- wrap.querySelector('#btn-kerja').addEventListener('click', ()=>{ form.jenis='kerja'; renderIsiLaporan(clearAndGet(container)); });
- wrap.querySelector('#btn-libur').addEventListener('click', ()=>{ form.jenis='libur'; renderIsiLaporan(clearAndGet(container)); });
+  wrap.querySelector('#f-tanggal').addEventListener('change', e=>{ form.tanggal = e.target.value; });
+  wrap.querySelector('#btn-kerja').addEventListener('click', ()=>{ form.jenis='kerja'; renderIsiLaporan(clearAndGet(container)); });
+  wrap.querySelector('#btn-libur').addEventListener('click', ()=>{ form.jenis='libur'; renderIsiLaporan(clearAndGet(container)); });
 
- wrap.querySelector('#btn-save').addEventListener('click', async ()=>{
- const tgl = wrap.querySelector('#f-tanggal').value;
- if(!tgl){ showToast('Pilih tanggal terlebih dahulu'); return; }
- let entry;
- if(form.jenis === 'kerja'){
- const jm = wrap.querySelector('#f-jammulai') ? wrap.querySelector('#f-jammulai').value : form.jamMulai;
- const js = wrap.querySelector('#f-jamselesai') ? wrap.querySelector('#f-jamselesai').value : form.jamSelesai;
- const kegiatanBersih = form.kegiatan.map(k=>k.trim()).filter(k=>k.length>0);
- if(kegiatanBersih.length===0){ showToast('Isi minimal satu poin kegiatan'); return; }
- entry = { jenis:'kerja', jamMulai:jm, jamSelesai:js, kegiatan:kegiatanBersih,
- existingFotoFileIds: form.fotoExisting.map(f=>f.fileId), newFotoBase64: form.fotoNewBase64 };
- } else {
- const ket = wrap.querySelector('#f-libur') ? wrap.querySelector('#f-libur').value : 'LIBUR';
- entry = { jenis:'libur', keterangan: ket || 'LIBUR' };
- }
- const result = await saveEntry(state.personId, tgl, entry);
- if(result.success){
- if(result.warnings.length){
- showToast('Tersimpan, tapi: ' + result.warnings.join(' | '));
- } else {
- showToast('Laporan tersimpan');
- }
- resetForm();
- render();
- }
- });
+  wrap.querySelector('#btn-save').addEventListener('click', async ()=>{
+    const tgl = wrap.querySelector('#f-tanggal').value;
+    if(!tgl){ showToast('Pilih tanggal terlebih dahulu'); return; }
+    let entry;
+    if(form.jenis === 'kerja'){
+      const jm = wrap.querySelector('#f-jammulai') ? wrap.querySelector('#f-jammulai').value : form.jamMulai;
+      const js = wrap.querySelector('#f-jamselesai') ? wrap.querySelector('#f-jamselesai').value : form.jamSelesai;
+      const kegiatanBersih = form.kegiatan.map(k=>k.trim()).filter(k=>k.length>0);
+      if(kegiatanBersih.length===0){ showToast('Isi minimal satu poin kegiatan'); return; }
+      entry = { jenis:'kerja', jamMulai:jm, jamSelesai:js, kegiatan:kegiatanBersih,
+        existingFotoFileIds: form.fotoExisting.map(f=>f.fileId), newFotoBase64: form.fotoNewBase64 };
+    } else {
+      const ket = wrap.querySelector('#f-libur') ? wrap.querySelector('#f-libur').value : 'LIBUR';
+      entry = { jenis:'libur', keterangan: ket || 'LIBUR' };
+    }
+    const result = await saveEntry(state.personId, tgl, entry);
+    if(result.success){
+      if(result.warnings.length){
+        showToast('Tersimpan, tapi: ' + result.warnings.join(' | '));
+      } else {
+        showToast('Laporan tersimpan');
+      }
+      resetForm();
+      render();
+    }
+  });
 
- const cancelBtn = wrap.querySelector('#btn-cancel-edit');
- if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ resetForm(); render(); });
+  const cancelBtn = wrap.querySelector('#btn-cancel-edit');
+  if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ resetForm(); render(); });
 }
 function clearAndGet(container){ container.innerHTML=''; return container; }
 
 /* ---------------- RIWAYAT ---------------- */
 async function renderRiwayat(container, personId, isTeamView, titleHtml){
- const p = PEOPLE.find(x=>x.id===personId);
- const wrap = document.createElement('div');
- wrap.innerHTML = `
- <div class="sticky-subheader" id="riwayat-subheader">
- ${titleHtml || ''}
- <div class="month-nav">
- <select id="sel-bulan"></select>
- <select id="sel-tahun"></select>
- <div class="search-box"><span></span><input type="text" id="f-search" placeholder="Cari judul laporan..."></div>
- </div>
- </div>
- <div class="card"><div class="empty">Memuat data...</div></div>
- `;
- container.appendChild(wrap);
- const subheader = wrap.querySelector('#riwayat-subheader');
- if(subheader) container.style.setProperty('--thead-top', subheader.offsetHeight + 'px');
+  const p = PEOPLE.find(x=>x.id===personId);
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="sticky-subheader" id="riwayat-subheader">
+      ${titleHtml || ''}
+      <div class="month-nav">
+        <select id="sel-bulan"></select>
+        <select id="sel-tahun"></select>
+        <div class="search-box"><span></span><input type="text" id="f-search" placeholder="Cari judul laporan..."></div>
+      </div>
+    </div>
+    <div class="card"><div class="empty">Memuat data...</div></div>
+  `;
+  container.appendChild(wrap);
+  const subheader = wrap.querySelector('#riwayat-subheader');
+  if(subheader) container.style.setProperty('--thead-top', subheader.offsetHeight + 'px');
 
- const selBulan = wrap.querySelector('#sel-bulan');
- BULAN_NAMA.forEach((b,i)=>{
- const o = document.createElement('option'); o.value=i+1; o.textContent=b;
- if(i+1===state.historyMonth) o.selected=true;
- selBulan.appendChild(o);
- });
- const selTahun = wrap.querySelector('#sel-tahun');
- const thisYear = new Date().getFullYear();
- for(let y=thisYear-1; y<=thisYear+1; y++){
- const o = document.createElement('option'); o.value=y; o.textContent=y;
- if(y===state.historyYear) o.selected=true;
- selTahun.appendChild(o);
- }
+  const selBulan = wrap.querySelector('#sel-bulan');
+  BULAN_NAMA.forEach((b,i)=>{
+    const o = document.createElement('option'); o.value=i+1; o.textContent=b;
+    if(i+1===state.historyMonth) o.selected=true;
+    selBulan.appendChild(o);
+  });
+  const selTahun = wrap.querySelector('#sel-tahun');
+  const thisYear = new Date().getFullYear();
+  for(let y=thisYear-1; y<=thisYear+1; y++){
+    const o = document.createElement('option'); o.value=y; o.textContent=y;
+    if(y===state.historyYear) o.selected=true;
+    selTahun.appendChild(o);
+  }
 
- let cachedEntries = null;
- async function loadAndRenderTable(skipFetch){
- const cardHolder = wrap.querySelector('.card');
- if(!skipFetch){
- cardHolder.innerHTML = '<div class="empty">Memuat data...</div>';
- cachedEntries = await getEntriesForMonth(personId, state.historyYear, state.historyMonth);
- }
- const entries = cachedEntries || {};
- const searchInput = wrap.querySelector('#f-search');
- const query = (searchInput && searchInput.value || '').trim().toLowerCase();
- let dates = Object.keys(entries).sort();
- if(query){
- dates = dates.filter(dateStr=>{
- const e = entries[dateStr];
- const teksLengkap = e.jenis==='kerja' ? (e.kegiatan||[]).join(' ') : (e.keterangan||'');
- return teksLengkap.toLowerCase().includes(query);
- });
- }
- if(dates.length===0){
- cardHolder.innerHTML = `<div class="empty">${query ? 'Tidak ada laporan yang cocok dengan pencarian.' : `Belum ada laporan untuk ${BULAN_NAMA[state.historyMonth-1]} ${state.historyYear}.`}</div>`;
- return;
- }
- const table = document.createElement('table');
- table.innerHTML = `<thead><tr>
- <th style="width:100px"> Tanggal</th><th style="width:70px"> Jenis</th><th style="width:110px"> Jam</th><th> Kegiatan</th><th style="width:130px">Aksi</th>
- </tr></thead><tbody></tbody>`;
- const tbody = table.querySelector('tbody');
- dates.forEach((dateStr,rowIdx)=>{
- const e = entries[dateStr];
- const d = new Date(dateStr+'T00:00:00');
- const label = `${pad2(d.getDate())} ${BULAN_NAMA[d.getMonth()].slice(0,3)} - ${HARI_NAMA[d.getDay()]}`;
- const tr = document.createElement('tr');
- if(rowIdx % 2 === 1) tr.classList.add('row-even');
- tr.style.setProperty('--rowbar', ROW_BAR_COLORS[rowIdx % ROW_BAR_COLORS.length]);
- if(e.jenis==='kerja'){
- tr.innerHTML = `
- <td data-label="Tanggal">${label}</td>
- <td data-label="Jenis"><span class="tag kerja">Kerja</span></td>
- <td data-label="Jam">${e.jamMulai} - ${e.jamSelesai}</td>
- <td data-label="Kegiatan"><div class="kegiatan-preview">${e.kegiatan.map((k,i)=>`${i+1}. ${escapeHtml(k)}`).join(String.fromCharCode(10))}</div>
- ${(e.fotoList && e.fotoList.length) ? `<div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">${e.fotoList.map(f=>`<a href="${f.url}" target="_blank" rel="noopener" title="Lihat foto"><img src="${f.url}" style="width:32px;height:32px;object-fit:cover;border-radius:4px;border:1px solid var(--line);"></a>`).join('')}</div>` : ''}
- </td>
- <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}"> Edit</button><button class="del" data-del="${dateStr}"> Hapus</button></td>
- `;
- } else {
- tr.innerHTML = `
- <td data-label="Tanggal">${label}</td>
- <td data-label="Jenis"><span class="tag libur">Libur</span></td>
- <td data-label="Jam">-</td>
- <td data-label="Kegiatan"><div class="kegiatan-preview">${escapeHtml(e.keterangan||'LIBUR')}</div></td>
- <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}"> Edit</button><button class="del" data-del="${dateStr}"> Hapus</button></td>
- `;
- }
- tbody.appendChild(tr);
- });
- cardHolder.innerHTML = '';
- cardHolder.appendChild(table);
+  let cachedEntries = null;
+  async function loadAndRenderTable(skipFetch){
+    const cardHolder = wrap.querySelector('.card');
+    if(!skipFetch){
+      cardHolder.innerHTML = '<div class="empty">Memuat data...</div>';
+      cachedEntries = await getEntriesForMonth(personId, state.historyYear, state.historyMonth);
+    }
+    const entries = cachedEntries || {};
+    const searchInput = wrap.querySelector('#f-search');
+    const query = (searchInput && searchInput.value || '').trim().toLowerCase();
+    let dates = Object.keys(entries).sort();
+    if(query){
+      dates = dates.filter(dateStr=>{
+        const e = entries[dateStr];
+        const teksLengkap = e.jenis==='kerja' ? (e.kegiatan||[]).join(' ') : (e.keterangan||'');
+        return teksLengkap.toLowerCase().includes(query);
+      });
+    }
+    if(dates.length===0){
+      cardHolder.innerHTML = `<div class="empty">${query ? 'Tidak ada laporan yang cocok dengan pencarian.' : `Belum ada laporan untuk ${BULAN_NAMA[state.historyMonth-1]} ${state.historyYear}.`}</div>`;
+      return;
+    }
+    const table = document.createElement('table');
+    table.innerHTML = `<thead><tr>
+      <th style="width:100px">Tanggal</th><th style="width:70px">Jenis</th><th style="width:110px">Jam</th><th>Kegiatan</th><th style="width:130px">Aksi</th>
+    </tr></thead><tbody></tbody>`;
+    const tbody = table.querySelector('tbody');
+    dates.forEach((dateStr,rowIdx)=>{
+      const e = entries[dateStr];
+      const d = new Date(dateStr+'T00:00:00');
+      const label = `${pad2(d.getDate())} ${BULAN_NAMA[d.getMonth()].slice(0,3)} - ${HARI_NAMA[d.getDay()]}`;
+      const tr = document.createElement('tr');
+      if(rowIdx % 2 === 1) tr.classList.add('row-even');
+      tr.style.setProperty('--rowbar', ROW_BAR_COLORS[rowIdx % ROW_BAR_COLORS.length]);
+      if(e.jenis==='kerja'){
+        tr.innerHTML = `
+          <td data-label="Tanggal">${label}</td>
+          <td data-label="Jenis"><span class="tag kerja">Kerja</span></td>
+          <td data-label="Jam">${e.jamMulai} - ${e.jamSelesai}</td>
+          <td data-label="Kegiatan"><div class="kegiatan-preview">${e.kegiatan.map((k,i)=>`${i+1}. ${escapeHtml(k)}`).join(String.fromCharCode(10))}</div>
+            ${(e.fotoList && e.fotoList.length) ? `<div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">${e.fotoList.map(f=>`<a href="${f.url}" target="_blank" rel="noopener" title="Lihat foto"><img src="${f.url}" style="width:32px;height:32px;object-fit:cover;border-radius:4px;border:1px solid var(--line);"></a>`).join('')}</div>` : ''}
+          </td>
+          <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}">Edit</button><button class="del" data-del="${dateStr}">Hapus</button></td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td data-label="Tanggal">${label}</td>
+          <td data-label="Jenis"><span class="tag libur">Libur</span></td>
+          <td data-label="Jam">-</td>
+          <td data-label="Kegiatan"><div class="kegiatan-preview">${escapeHtml(e.keterangan||'LIBUR')}</div></td>
+          <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}">Edit</button><button class="del" data-del="${dateStr}">Hapus</button></td>
+        `;
+      }
+      tbody.appendChild(tr);
+    });
+    cardHolder.innerHTML = '';
+    cardHolder.appendChild(table);
 
- tbody.querySelectorAll('[data-edit]').forEach(btn=>{
- btn.addEventListener('click', ()=>{
- const dateStr = btn.dataset.edit;
- const e = entries[dateStr];
- state.personId = personId;
- if(e.jenis==='kerja'){
- form = { tanggal:dateStr, jenis:'kerja', jamMulai:e.jamMulai, jamSelesai:e.jamSelesai, kegiatan:[...e.kegiatan],
- fotoExisting: (e.fotoList||[]).map(f=>({...f})), fotoNewBase64: [] };
- } else {
- form = { tanggal:dateStr, jenis:'libur', keteranganLibur:e.keterangan||'LIBUR', jamMulai:'08.00', jamSelesai:'17.00', kegiatan:[''], fotoExisting:[], fotoNewBase64:[] };
- }
- state.editingKey = dateStr;
- state.tab = 'isi';
- render();
- });
- });
- tbody.querySelectorAll('[data-del]').forEach(btn=>{
- btn.addEventListener('click', ()=>{
- showConfirmModal('Hapus laporan tanggal ini?', async ()=>{
- await deleteEntry(personId, btn.dataset.del);
- showToast('Laporan dihapus');
- loadAndRenderTable();
- });
- });
- });
- }
+    tbody.querySelectorAll('[data-edit]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const dateStr = btn.dataset.edit;
+        const e = entries[dateStr];
+        state.personId = personId;
+        if(e.jenis==='kerja'){
+          form = { tanggal:dateStr, jenis:'kerja', jamMulai:e.jamMulai, jamSelesai:e.jamSelesai, kegiatan:[...e.kegiatan],
+            fotoExisting: (e.fotoList||[]).map(f=>({...f})), fotoNewBase64: [] };
+        } else {
+          form = { tanggal:dateStr, jenis:'libur', keteranganLibur:e.keterangan||'LIBUR', jamMulai:'08.00', jamSelesai:'17.00', kegiatan:[''], fotoExisting:[], fotoNewBase64:[] };
+        }
+        state.editingKey = dateStr;
+        state.tab = 'isi';
+        render();
+      });
+    });
+    tbody.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        showConfirmModal('Hapus laporan tanggal ini?', async ()=>{
+          await deleteEntry(personId, btn.dataset.del);
+          showToast('Laporan dihapus');
+          loadAndRenderTable();
+        });
+      });
+    });
+  }
 
- selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; loadAndRenderTable(); });
- selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; loadAndRenderTable(); });
- const searchBox = wrap.querySelector('#f-search');
- let searchDebounce;
- searchBox.addEventListener('input', ()=>{ clearTimeout(searchDebounce); searchDebounce = setTimeout(()=>loadAndRenderTable(true), 200); });
+  selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; loadAndRenderTable(); });
+  selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; loadAndRenderTable(); });
+  const searchBox = wrap.querySelector('#f-search');
+  let searchDebounce;
+  searchBox.addEventListener('input', ()=>{ clearTimeout(searchDebounce); searchDebounce = setTimeout(()=>loadAndRenderTable(true), 200); });
 
- await loadAndRenderTable();
+  await loadAndRenderTable();
 }
 function showConfirmModal(message, onConfirm){
- const overlay = document.createElement('div');
- overlay.style.cssText = 'position:fixed; inset:0; background:rgba(20,25,35,0.55); display:flex; align-items:center; justify-content:center; z-index:1000;';
- overlay.innerHTML = `
- <div style="background:var(--card); border-radius:14px; padding:24px 26px; width:300px; max-width:90vw; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
- <p style="margin:0 0 18px; font-size:14.5px;">${message}</p>
- <div style="display:flex; gap:8px;">
- <button type="button" class="btn-secondary" id="confirm-modal-cancel" style="flex:1;">Batal</button>
- <button type="button" class="btn-primary" id="confirm-modal-ok" style="flex:1; background:var(--libur);">Hapus</button>
- </div>
- </div>
- `;
- document.body.appendChild(overlay);
- const close = ()=> overlay.remove();
- overlay.querySelector('#confirm-modal-ok').addEventListener('click', ()=>{ close(); onConfirm(); });
- overlay.querySelector('#confirm-modal-cancel').addEventListener('click', close);
- overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(20,25,35,0.55); display:flex; align-items:center; justify-content:center; z-index:1000;';
+  overlay.innerHTML = `
+    <div style="background:var(--card); border-radius:14px; padding:24px 26px; width:300px; max-width:90vw; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
+      <p style="margin:0 0 18px; font-size:14.5px;">${message}</p>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn-secondary" id="confirm-modal-cancel" style="flex:1;">Batal</button>
+        <button type="button" class="btn-primary" id="confirm-modal-ok" style="flex:1; background:var(--libur);">Hapus</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = ()=> overlay.remove();
+  overlay.querySelector('#confirm-modal-ok').addEventListener('click', ()=>{ close(); onConfirm(); });
+  overlay.querySelector('#confirm-modal-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
 }
 
 function escapeHtml(str){
- const d = document.createElement('div');
- d.textContent = str;
- return d.innerHTML;
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
 }
 
 /* ---------------- KONFIGURASI TAMBAHAN ---------------- */
-// Tempel link Google Sheet Anda di sini supaya tombol "Buka Google Sheet" berfungsi (opsional)
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1R_9I7nbO6f6jqxsc52xp1Aj65TA9bLapHvhBadtUh7g/edit?gid=0#gid=0';
 
 /* ---------------- TIM (LEADER VIEW) ---------------- */
 async function renderTim(container){
- const wrap = document.createElement('div');
- wrap.innerHTML = `
- <div class="sticky-subheader">
- <div class="view-title">
- <div class="badge-ico"></div>
- <div><h2>Rekap Tim</h2>
- <p>Pantau laporan seluruh anggota. Untuk membuat file Excel bulanan, buka Google Sheet lalu pilih menu <strong>Laporan Kerja &rarr; Buat Laporan Bulanan</strong>.</p></div>
- </div>
- <div class="month-nav">
- <select id="sel-bulan"></select>
- <select id="sel-tahun"></select>
- ${SHEET_URL.indexOf('https://')===0 ? `<a href="${SHEET_URL}" target="_blank" rel="noopener"><button class="btn-secondary" type="button">Buka Google Sheet </button></a>` : ''}
- <button class="btn-secondary" type="button" id="btn-cek-versi">Cek Koneksi Backend</button>
- </div>
- </div>
- <div id="versi-info"></div>
- <div class="card" id="team-summary"><div class="empty">Memuat...</div></div>
- <div id="detail-area"></div>
- `;
- container.appendChild(wrap);
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="sticky-subheader">
+      <div class="view-title">
+        <div class="badge-ico"></div>
+        <div><h2>Rekap Tim</h2>
+        <p>Pantau laporan seluruh anggota. Untuk membuat file Excel bulanan, buka Google Sheet lalu pilih menu <strong>Laporan Kerja &rarr; Buat Laporan Bulanan</strong>.</p></div>
+      </div>
+      <div class="month-nav">
+        <select id="sel-bulan"></select>
+        <select id="sel-tahun"></select>
+        ${SHEET_URL.indexOf('https://')===0 ? `<a href="${SHEET_URL}" target="_blank" rel="noopener"><button class="btn-secondary" type="button">Buka Google Sheet</button></a>` : ''}
+        <button class="btn-secondary" type="button" id="btn-cek-versi">Cek Koneksi Backend</button>
+      </div>
+    </div>
+    <div id="versi-info"></div>
+    <div class="card" id="team-summary"><div class="empty">Memuat...</div></div>
+    <div id="detail-area"></div>
+  `;
+  container.appendChild(wrap);
 
- wrap.querySelector('#btn-cek-versi').addEventListener('click', async ()=>{
- const infoEl = wrap.querySelector('#versi-info');
- infoEl.innerHTML = '<p class="empty">Menghubungi backend...</p>';
- if(!storageReady()){
- infoEl.innerHTML = '<p style="color:var(--libur);">google.script.run tidak tersedia - pastikan halaman ini dibuka lewat link Web App, bukan file lokal.</p>';
- return;
- }
- try{
- const data = await callServer('apiVersion');
- if(data.ok){
- infoEl.innerHTML = `<p style="color:var(--ok);">OK Terhubung. Versi backend: <strong>${data.version}</strong><br>Waktu server: ${data.waktuServer}</p>`;
- } else {
- infoEl.innerHTML = `<p style="color:var(--libur);">Backend merespons tapi error: ${data.error}</p>`;
- }
- }catch(e){
- infoEl.innerHTML = `<p style="color:var(--libur);">Tidak bisa terhubung ke backend: ${e.message}. Pastikan Code.gs sudah di-deploy versi terbaru.</p>`;
- }
- });
+  wrap.querySelector('#btn-cek-versi').addEventListener('click', async ()=>{
+    const infoEl = wrap.querySelector('#versi-info');
+    infoEl.innerHTML = '<p class="empty">Menghubungi backend...</p>';
+    if(!storageReady()){
+      infoEl.innerHTML = '<p style="color:var(--libur);">WEB_APP_URL belum diisi.</p>';
+      return;
+    }
+    try{
+      const res = await fetch(`${WEB_APP_URL}?action=version`);
+      const data = await res.json();
+      if(data.ok){
+        infoEl.innerHTML = `<p style="color:var(--ok);">Terhubung. Versi backend: <strong>${data.version}</strong><br>Waktu server: ${data.waktuServer}</p>`;
+      } else {
+        infoEl.innerHTML = `<p style="color:var(--libur);">Backend merespons tapi error: ${data.error}</p>`;
+      }
+    }catch(e){
+      infoEl.innerHTML = `<p style="color:var(--libur);">Tidak bisa terhubung ke backend: ${e.message}.</p>`;
+    }
+  });
 
- const selBulan = wrap.querySelector('#sel-bulan');
- BULAN_NAMA.forEach((b,i)=>{
- const o = document.createElement('option'); o.value=i+1; o.textContent=b;
- if(i+1===state.historyMonth) o.selected=true;
- selBulan.appendChild(o);
- });
- const selTahun = wrap.querySelector('#sel-tahun');
- const thisYear = new Date().getFullYear();
- for(let y=thisYear-1; y<=thisYear+1; y++){
- const o = document.createElement('option'); o.value=y; o.textContent=y;
- if(y===state.historyYear) o.selected=true;
- selTahun.appendChild(o);
- }
+  const selBulan = wrap.querySelector('#sel-bulan');
+  BULAN_NAMA.forEach((b,i)=>{
+    const o = document.createElement('option'); o.value=i+1; o.textContent=b;
+    if(i+1===state.historyMonth) o.selected=true;
+    selBulan.appendChild(o);
+  });
+  const selTahun = wrap.querySelector('#sel-tahun');
+  const thisYear = new Date().getFullYear();
+  for(let y=thisYear-1; y<=thisYear+1; y++){
+    const o = document.createElement('option'); o.value=y; o.textContent=y;
+    if(y===state.historyYear) o.selected=true;
+    selTahun.appendChild(o);
+  }
 
- async function loadSummary(){
- const summaryEl = wrap.querySelector('#team-summary');
- summaryEl.innerHTML = '<div class="empty">Memuat...</div>';
- const year = state.historyYear, month = state.historyMonth;
- const daysInMonth = new Date(year, month, 0).getDate();
- summaryEl.innerHTML = '';
- for(const p of PEOPLE){
- const entries = await getEntriesForMonth(p.id, year, month);
- const filled = Object.keys(entries).length;
- const pct = Math.round((filled/daysInMonth)*100);
- const row = document.createElement('div');
- row.className = 'team-card';
- row.innerHTML = `
- <div style="display:flex; align-items:center; gap:12px;">
- ${avatarHtml(p)}
- <div>
- <strong>${p.nama}</strong>
- <div class="meta">${p.jabatan} - ${filled} dari ${daysInMonth} hari terisi</div>
- <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
- </div>
- </div>
- <div style="display:flex; gap:8px;">
- <button class="btn-secondary" data-detail="${p.id}">Lihat / Edit</button>
- </div>
- `;
- summaryEl.appendChild(row);
- }
- summaryEl.querySelectorAll('[data-detail]').forEach(btn=>{
- btn.addEventListener('click', async ()=>{
- const detailArea = wrap.querySelector('#detail-area');
- detailArea.innerHTML = `<h3 style="margin-bottom:10px;">Detail - ${PEOPLE.find(p=>p.id===btn.dataset.detail).nama}</h3>`;
- await renderRiwayat(detailArea, btn.dataset.detail, true);
- });
- });
- }
+  async function loadSummary(){
+    const summaryEl = wrap.querySelector('#team-summary');
+    summaryEl.innerHTML = '<div class="empty">Memuat...</div>';
+    const year = state.historyYear, month = state.historyMonth;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    summaryEl.innerHTML = '';
+    for(const p of PEOPLE){
+      const entries = await getEntriesForMonth(p.id, year, month);
+      const filled = Object.keys(entries).length;
+      const pct = Math.round((filled/daysInMonth)*100);
+      const row = document.createElement('div');
+      row.className = 'team-card';
+      row.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          ${avatarHtml(p)}
+          <div>
+            <strong>${p.nama}</strong>
+            <div class="meta">${p.jabatan} - ${filled} dari ${daysInMonth} hari terisi</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" data-detail="${p.id}">Lihat / Edit</button>
+        </div>
+      `;
+      summaryEl.appendChild(row);
+    }
+    summaryEl.querySelectorAll('[data-detail]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const detailArea = wrap.querySelector('#detail-area');
+        detailArea.innerHTML = `<h3 style="margin-bottom:10px;">Detail - ${PEOPLE.find(p=>p.id===btn.dataset.detail).nama}</h3>`;
+        await renderRiwayat(detailArea, btn.dataset.detail, true);
+      });
+    });
+  }
 
- selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
- selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
+  selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
+  selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
 
- await loadSummary();
+  await loadSummary();
 }
-
 
 /* ---------------- MAIN RENDER ---------------- */
 async function render(){
- renderSidebar();
- renderTopbar();
- const main = document.getElementById('main');
- main.innerHTML = '';
- if(!currentPerson()){
- main.innerHTML = `
- <div class="view-title">
- <div class="badge-ico"></div>
- <div><h2>Selamat datang</h2>
- <p>Pilih nama Anda di sebelah kiri, lalu masukkan PIN untuk mulai mengisi laporan.</p></div>
- </div>
- <div class="card"><div class="empty">Laporan setiap orang bersifat pribadi - hanya bisa dibuka dengan PIN masing-masing. Team Leader dapat melihat rekap seluruh tim setelah masuk.</div></div>
- `;
- return;
- }
- if(state.tab === 'beranda'){
- await renderBeranda(main);
- } else if(state.tab === 'isi'){
- renderIsiLaporan(main);
- } else if(state.tab === 'riwayat'){
- const titleHtml = `<div class="view-title"><div class="badge-ico"></div><div><h2>Riwayat Laporan Saya</h2><p>${currentPerson().nama} - ${currentPerson().jabatan}</p></div></div>`;
- await renderRiwayat(main, state.personId, false, titleHtml);
- } else if(state.tab === 'tim'){
- await renderTim(main);
- } else if(state.tab === 'pengaturan'){
- await renderPengaturan(main);
- }
+  renderSidebar();
+  renderTopbar();
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  if(!currentPerson()){
+    main.innerHTML = `
+      <div class="view-title">
+        <div class="badge-ico"></div>
+        <div><h2>Selamat datang</h2>
+        <p>Pilih nama Anda di sebelah kiri, lalu masukkan PIN untuk mulai mengisi laporan.</p></div>
+      </div>
+      <div class="card"><div class="empty">Laporan setiap orang bersifat pribadi - hanya bisa dibuka dengan PIN masing-masing. Team Leader dapat melihat rekap seluruh tim setelah masuk.</div></div>
+    `;
+    return;
+  }
+  if(state.tab === 'beranda'){
+    await renderBeranda(main);
+  } else if(state.tab === 'isi'){
+    renderIsiLaporan(main);
+  } else if(state.tab === 'riwayat'){
+    const titleHtml = `<div class="view-title"><div class="badge-ico"></div><div><h2>Riwayat Laporan Saya</h2><p>${currentPerson().nama} - ${currentPerson().jabatan}</p></div></div>`;
+    await renderRiwayat(main, state.personId, false, titleHtml);
+  } else if(state.tab === 'tim'){
+    await renderTim(main);
+  } else if(state.tab === 'pengaturan'){
+    await renderPengaturan(main);
+  }
 }
 
 /* ---------------- BERANDA ---------------- */
 async function renderBeranda(container){
- const p = currentPerson();
- const wrap = document.createElement('div');
- const now = new Date();
- const jamSekarang = now.getHours();
- const sapaan = jamSekarang < 11 ? 'Selamat pagi' : jamSekarang < 15 ? 'Selamat siang' : jamSekarang < 18 ? 'Selamat sore' : 'Selamat malam';
+  const p = currentPerson();
+  const wrap = document.createElement('div');
+  const now = new Date();
+  const jamSekarang = now.getHours();
+  const sapaan = jamSekarang < 11 ? 'Selamat pagi' : jamSekarang < 15 ? 'Selamat siang' : jamSekarang < 18 ? 'Selamat sore' : 'Selamat malam';
 
- wrap.innerHTML = `
- <div class="cta-banner">
- <div>
- <h3>${sapaan}, ${p.nama.split(',')[0]} </h3>
- <p>Jangan lupa isi laporan kegiatan hari ini sebelum jam kerja berakhir.</p>
- </div>
- <button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);"> Isi Laporan Sekarang</button>
- </div>
- <div class="stat-grid" id="beranda-stats">
- <div class="card"><div class="empty">Memuat ringkasan...</div></div>
- </div>
- ${p.isLead ? '<div class="view-title" style="margin-bottom:12px;"><h2 style="font-size:17px;">Progres Tim Bulan Ini</h2></div><div class="card" id="beranda-team"><div class="empty">Memuat...</div></div>' : ''}
- `;
- container.appendChild(wrap);
- wrap.querySelector('#btn-cta-isi').addEventListener('click', ()=>{ state.tab='isi'; render(); });
+  wrap.innerHTML = `
+    <div class="cta-banner">
+      <div>
+        <h3>${sapaan}, ${p.nama.split(',')[0]}</h3>
+        <p>Jangan lupa isi laporan kegiatan hari ini sebelum jam kerja berakhir.</p>
+      </div>
+      <button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">Isi Laporan Sekarang</button>
+    </div>
+    <div class="stat-grid" id="beranda-stats">
+      <div class="card"><div class="empty">Memuat ringkasan...</div></div>
+    </div>
+    ${p.isLead ? '<div class="view-title" style="margin-bottom:12px;"><h2 style="font-size:17px;">Progres Tim Bulan Ini</h2></div><div class="card" id="beranda-team"><div class="empty">Memuat...</div></div>' : ''}
+  `;
+  container.appendChild(wrap);
+  wrap.querySelector('#btn-cta-isi').addEventListener('click', ()=>{ state.tab='isi'; render(); });
 
- const year = now.getFullYear(), month = now.getMonth()+1;
- const daysInMonth = new Date(year, month, 0).getDate();
- const daysSoFar = now.getDate();
- const entries = await getEntriesForMonth(p.id, year, month);
- const filled = Object.keys(entries).length;
- const todayStr = `${year}-${pad2(month)}-${pad2(now.getDate())}`;
- const isiHariIni = !!entries[todayStr];
+  const year = now.getFullYear(), month = now.getMonth()+1;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const daysSoFar = now.getDate();
+  const entries = await getEntriesForMonth(p.id, year, month);
+  const filled = Object.keys(entries).length;
+  const todayStr = `${year}-${pad2(month)}-${pad2(now.getDate())}`;
+  const isiHariIni = !!entries[todayStr];
 
- const statsEl = wrap.querySelector('#beranda-stats');
- statsEl.innerHTML = `
- <div class="stat-card"><div class="num">${filled} / ${daysSoFar}</div><div class="label">Hari terisi bulan ini</div></div>
- <div class="stat-card"><div class="num">${isiHariIni ? 'OK ' : '-'}</div><div class="label">Laporan hari ini</div></div>
- <div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>
- `;
+  const statsEl = wrap.querySelector('#beranda-stats');
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="num">${filled} / ${daysSoFar}</div><div class="label">Hari terisi bulan ini</div></div>
+    <div class="stat-card"><div class="num">${isiHariIni ? 'Ya' : '-'}</div><div class="label">Laporan hari ini</div></div>
+    <div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>
+  `;
 
- if(p.isLead){
- const teamEl = wrap.querySelector('#beranda-team');
- teamEl.innerHTML = '';
- for(const person of PEOPLE){
- const e = await getEntriesForMonth(person.id, year, month);
- const f = Object.keys(e).length;
- const pct = Math.round((f/daysSoFar)*100);
- const row = document.createElement('div');
- row.className = 'team-card';
- row.innerHTML = `
- <div style="display:flex; align-items:center; gap:10px;">
- ${avatarHtml(person)}
- <div><strong>${person.nama}</strong><div class="meta">${f} dari ${daysSoFar} hari berjalan terisi</div></div>
- </div>
- <div class="progress-bar" style="margin-top:0;"><div class="progress-fill" style="width:${pct}%"></div></div>
- `;
- teamEl.appendChild(row);
- }
- }
+  if(p.isLead){
+    const teamEl = wrap.querySelector('#beranda-team');
+    teamEl.innerHTML = '';
+    for(const person of PEOPLE){
+      const e = await getEntriesForMonth(person.id, year, month);
+      const f = Object.keys(e).length;
+      const pct = Math.round((f/daysSoFar)*100);
+      const row = document.createElement('div');
+      row.className = 'team-card';
+      row.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          ${avatarHtml(person)}
+          <div><strong>${person.nama}</strong><div class="meta">${f} dari ${daysSoFar} hari berjalan terisi</div></div>
+        </div>
+        <div class="progress-bar" style="margin-top:0;"><div class="progress-fill" style="width:${pct}%"></div></div>
+      `;
+      teamEl.appendChild(row);
+    }
+  }
 }
 
 /* ---------------- PENGATURAN ---------------- */
 async function renderPengaturan(container){
- const p = currentPerson();
- const wrap = document.createElement('div');
- wrap.innerHTML = `
- <div class="view-title"><div class="badge-ico"></div><div><h2>Pengaturan</h2><p>${p.nama} - ${p.jabatan}</p></div></div>
+  const p = currentPerson();
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="view-title"><div class="badge-ico"></div><div><h2>Pengaturan</h2><p>${p.nama} - ${p.jabatan}</p></div></div>
 
- <div class="card">
- <h3 style="font-size:15px; margin-bottom:14px;">Foto Profil</h3>
- <div style="display:flex; align-items:center; gap:16px;">
- ${avatarHtml(p,'xl')}
- <div>
- <input type="file" accept="image/*" id="f-avatar">
- <div style="font-size:12.5px; color:var(--ink-soft); margin-top:6px;">JPG/PNG, otomatis diperkecil.</div>
- </div>
- </div>
- </div>
+    <div class="card">
+      <h3 style="font-size:15px; margin-bottom:14px;">Foto Profil</h3>
+      <div style="display:flex; align-items:center; gap:16px;">
+        ${avatarHtml(p,'xl')}
+        <div>
+          <input type="file" accept="image/*" id="f-avatar">
+          <div style="font-size:12.5px; color:var(--ink-soft); margin-top:6px;">JPG/PNG, otomatis diperkecil.</div>
+        </div>
+      </div>
+    </div>
 
- <div class="card">
- <h3 style="font-size:15px; margin-bottom:14px;">Ganti PIN</h3>
- <div class="row">
- <div class="field"><label>PIN Lama</label><input type="password" id="f-oldpin" inputmode="numeric" style="width:140px;"></div>
- <div class="field"><label>PIN Baru</label><input type="password" id="f-newpin" inputmode="numeric" style="width:140px;"></div>
- <div class="field"><label>Ulangi PIN Baru</label><input type="password" id="f-newpin2" inputmode="numeric" style="width:140px;"></div>
- </div>
- <button class="btn-primary" id="btn-ganti-pin">Simpan PIN Baru</button>
- </div>
+    <div class="card">
+      <h3 style="font-size:15px; margin-bottom:14px;">Ganti PIN</h3>
+      <div class="row">
+        <div class="field"><label>PIN Lama</label><input type="password" id="f-oldpin" inputmode="numeric" style="width:140px;"></div>
+        <div class="field"><label>PIN Baru</label><input type="password" id="f-newpin" inputmode="numeric" style="width:140px;"></div>
+        <div class="field"><label>Ulangi PIN Baru</label><input type="password" id="f-newpin2" inputmode="numeric" style="width:140px;"></div>
+      </div>
+      <button class="btn-primary" id="btn-ganti-pin">Simpan PIN Baru</button>
+    </div>
 
- ${p.isLead ? `
- <div class="card">
- <h3 style="font-size:15px; margin-bottom:6px;">Banner Aplikasi</h3>
- <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 14px;">Foto ini tampil di bagian atas untuk semua anggota tim (misalnya foto gedung DPRD).</p>
- <input type="file" accept="image/*" id="f-banner">
- </div>` : ''}
- `;
- container.appendChild(wrap);
+    ${p.isLead ? `
+    <div class="card">
+      <h3 style="font-size:15px; margin-bottom:6px;">Banner Aplikasi</h3>
+      <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 14px;">Foto ini tampil di bagian atas untuk semua anggota tim (misalnya foto gedung DPRD).</p>
+      <input type="file" accept="image/*" id="f-banner">
+    </div>` : ''}
+  `;
+  container.appendChild(wrap);
 
- wrap.querySelector('#f-avatar').addEventListener('change', async (e)=>{
- const file = e.target.files[0];
- if(!file) return;
- showToast('Mengunggah foto profil...');
- try{
- const dataUrl = await compressImageFile(file);
- const data = await callServer('apiUpdateAvatar', p.id, dataUrl);
- if(!data.ok) throw new Error(data.error);
- p.avatarUrl = data.url;
- showToast('Foto profil diperbarui');
- render();
- }catch(err){ showToast('Gagal upload: ' + err.message); }
- });
+  wrap.querySelector('#f-avatar').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    showToast('Mengunggah foto profil...');
+    try{
+      const dataUrl = await compressImageFile(file);
+      const res = await fetch(WEB_APP_URL, {
+        method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'updateavatar', personId:p.id, avatarBase64:dataUrl })
+      });
+      const data = await res.json();
+      if(!data.ok) throw new Error(data.error);
+      p.avatarUrl = data.url;
+      showToast('Foto profil diperbarui');
+      render();
+    }catch(err){ showToast('Gagal upload: ' + err.message); }
+  });
 
- wrap.querySelector('#btn-ganti-pin').addEventListener('click', async ()=>{
- const oldPin = wrap.querySelector('#f-oldpin').value.trim();
- const newPin = wrap.querySelector('#f-newpin').value.trim();
- const newPin2 = wrap.querySelector('#f-newpin2').value.trim();
- if(!oldPin || !newPin){ showToast('Isi semua kolom PIN'); return; }
- if(newPin !== newPin2){ showToast('PIN baru tidak sama'); return; }
- try{
- const data = await callServer('apiChangePin', p.id, oldPin, newPin);
- if(!data.ok) throw new Error(data.error);
- showToast('PIN berhasil diganti');
- wrap.querySelector('#f-oldpin').value='';
- wrap.querySelector('#f-newpin').value='';
- wrap.querySelector('#f-newpin2').value='';
- }catch(err){ showToast('Gagal: ' + err.message); }
- });
+  wrap.querySelector('#btn-ganti-pin').addEventListener('click', async ()=>{
+    const oldPin = wrap.querySelector('#f-oldpin').value.trim();
+    const newPin = wrap.querySelector('#f-newpin').value.trim();
+    const newPin2 = wrap.querySelector('#f-newpin2').value.trim();
+    if(!oldPin || !newPin){ showToast('Isi semua kolom PIN'); return; }
+    if(newPin !== newPin2){ showToast('PIN baru tidak sama'); return; }
+    try{
+      const res = await fetch(WEB_APP_URL, {
+        method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'changepin', personId:p.id, oldPin, newPin })
+      });
+      const data = await res.json();
+      if(!data.ok) throw new Error(data.error);
+      showToast('PIN berhasil diganti');
+      wrap.querySelector('#f-oldpin').value='';
+      wrap.querySelector('#f-newpin').value='';
+      wrap.querySelector('#f-newpin2').value='';
+    }catch(err){ showToast('Gagal: ' + err.message); }
+  });
 
- const bannerInput = wrap.querySelector('#f-banner');
- if(bannerInput){
- bannerInput.addEventListener('change', async (e)=>{
- const file = e.target.files[0];
- if(!file) return;
- showToast('Mengunggah banner...');
- try{
- const dataUrl = await compressImageFile(file);
- const data = await callServer('apiSetBanner', p.id, dataUrl);
- if(!data.ok) throw new Error(data.error);
- BANNER_URL = data.url;
- showToast('Banner diperbarui untuk semua orang');
- renderTopbar();
- }catch(err){ showToast('Gagal: ' + err.message); }
- });
- }
+  const bannerInput = wrap.querySelector('#f-banner');
+  if(bannerInput){
+    bannerInput.addEventListener('change', async (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      showToast('Mengunggah banner...');
+      try{
+        const dataUrl = await compressImageFile(file);
+        const res = await fetch(WEB_APP_URL, {
+          method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify({ action:'setbanner', personId:p.id, bannerBase64:dataUrl })
+        });
+        const data = await res.json();
+        if(!data.ok) throw new Error(data.error);
+        BANNER_URL = data.url;
+        showToast('Banner diperbarui untuk semua orang');
+        renderTopbar();
+      }catch(err){ showToast('Gagal: ' + err.message); }
+    });
+  }
 }
 
 async function loadRoster(){
- if(!storageReady()){
- document.getElementById('main').innerHTML = `
- <div class="view-title"><h2>Belum tersambung</h2></div>
- <div class="card"><div class="empty">Halaman ini sepertinya dibuka bukan lewat link Web App (google.script.run tidak tersedia). Buka lewat URL https://script.google.com/macros/s/.../exec</div></div>`;
- return false;
- }
- try{
- const data = await callServer('apiRoster');
- if(data.ok && Array.isArray(data.people)){
- PEOPLE = data.people;
- BANNER_URL = data.bannerUrl || '';
- return true;
- }
- throw new Error(data.error || 'Format data tidak sesuai');
- }catch(e){
- console.error(e);
- document.getElementById('main').innerHTML = `
- <div class="view-title"><h2>Gagal memuat daftar anggota</h2></div>
- <div class="card"><div class="empty">${e.message}. Pastikan Code.gs sudah di-deploy versi terbaru, lalu muat ulang halaman ini.</div></div>`;
- return false;
- }
+  if(!storageReady()){
+    document.getElementById('main').innerHTML = `
+      <div class="view-title"><h2>Belum tersambung</h2></div>
+      <div class="card"><div class="empty">Aplikasi belum disambungkan ke Google Sheets.</div></div>`;
+    return false;
+  }
+  try{
+    const res = await fetch(`${WEB_APP_URL}?action=roster`);
+    const data = await res.json();
+    if(data.ok && Array.isArray(data.people)){
+      PEOPLE = data.people;
+      BANNER_URL = data.bannerUrl || '';
+      return true;
+    }
+    throw new Error(data.error || 'Format data tidak sesuai');
+  }catch(e){
+    console.error(e);
+    document.getElementById('main').innerHTML = `
+      <div class="view-title"><h2>Gagal memuat daftar anggota</h2></div>
+      <div class="card"><div class="empty">${e.message}. Pastikan internet aktif dan URL Web App benar, lalu muat ulang halaman ini.</div></div>`;
+    return false;
+  }
 }
 
 async function init(){
- document.getElementById('main').innerHTML = '<div class="card"><div class="empty">Memuat aplikasi...</div></div>';
- const ok = await loadRoster();
- renderTopbar();
- if(ok) render();
+  document.getElementById('main').innerHTML = '<div class="card"><div class="empty">Memuat aplikasi...</div></div>';
+  const ok = await loadRoster();
+  renderTopbar();
+  if(ok) render();
 }
 
 init();
