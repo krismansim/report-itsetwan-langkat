@@ -402,7 +402,7 @@ function renderTopbar(){
     const tgl = `${now.getDate()} ${BULAN_NAMA[now.getMonth()]} ${now.getFullYear()}`;
     const jam = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())} WIB`;
     const clockEl = document.getElementById('topbarClock');
-    if(clockEl) clockEl.innerHTML = `<div class="row">${hari}, ${tgl}</div><div class="row">${jam}</div>`;
+    if(clockEl) clockEl.innerHTML = `<div class="row">&#128197; ${hari}, ${tgl}</div><div class="row">&#128336; ${jam}</div>`;
   }
   tick();
   clearInterval(clockTimer);
@@ -479,7 +479,7 @@ function renderSidebar(){
   PEOPLE.forEach(p=>{
     const btn = document.createElement('button');
     btn.className = 'person-btn' + (p.id===state.personId ? ' active':'');
-    const lockIcon = state.unlocked.has(p.id) ? '' : '<span style="font-size:10px; opacity:0.7;">(PIN)</span>';
+    const lockIcon = state.unlocked.has(p.id) ? '' : '<span style="font-size:11px; opacity:0.8;">&#128274;</span>';
     btn.innerHTML = `${avatarHtml(p)}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.nama}</span><span class="role">${p.jabatan}</span></span><span class="lock">${lockIcon}</span>`;
     btn.onclick = ()=> trySwitchPerson(p.id);
     list.appendChild(btn);
@@ -498,12 +498,12 @@ function renderSidebar(){
   currentCard.innerHTML = `<div class="person-btn active" style="cursor:default;">${avatarHtml(p,'lg')}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;">${p.nama}</span><span class="role">${p.jabatan}</span></span></div>`;
 
   const tabs = [
-    ['beranda','','Beranda'],
-    ['isi','','Isi Laporan'],
-    ['riwayat','','Riwayat Laporan Saya'],
+    ['beranda','&#127968;','Beranda'],
+    ['isi','&#128221;','Isi Laporan'],
+    ['riwayat','&#128197;','Riwayat Laporan Saya'],
   ];
-  if(p.isLead) tabs.push(['tim','','Laporan Tim']);
-  tabs.push(['pengaturan','','Pengaturan']);
+  if(p.isLead) tabs.push(['tim','&#128101;','Laporan Tim']);
+  tabs.push(['pengaturan','&#9881;&#65039;','Pengaturan']);
   tabs.forEach(([key,ico,label])=>{
     const b = document.createElement('button');
     b.innerHTML = `<span class="ico">${ico}</span> ${label}`;
@@ -574,7 +574,7 @@ function renderIsiLaporan(container){
 
   wrap.innerHTML = `
     <div class="view-title">
-      <div class="badge-ico"></div>
+      <div class="badge-ico">&#128221;</div>
       <div><h2>Isi Laporan Harian</h2>
       <p>Diisi sebagai <strong>${p.nama}</strong> - ${p.jabatan}</p></div>
     </div>
@@ -788,7 +788,7 @@ async function renderRiwayat(container, personId, isTeamView, titleHtml){
       <div class="month-nav">
         <select id="sel-bulan"></select>
         <select id="sel-tahun"></select>
-        <div class="search-box"><span></span><input type="text" id="f-search" placeholder="Cari judul laporan..."></div>
+        <div class="search-box"><span>&#128269;</span><input type="text" id="f-search" placeholder="Cari judul laporan..."></div>
       </div>
     </div>
     <div class="card"><div class="empty">Memuat data...</div></div>
@@ -853,7 +853,7 @@ async function renderRiwayat(container, personId, isTeamView, titleHtml){
           <td data-label="Kegiatan"><div class="kegiatan-preview">${e.kegiatan.map((k,i)=>`${i+1}. ${escapeHtml(k)}`).join(String.fromCharCode(10))}</div>
             ${(e.fotoList && e.fotoList.length) ? `<div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">${e.fotoList.map(f=>`<a href="${f.url}" target="_blank" rel="noopener" title="Lihat foto"><img src="${f.url}" style="width:32px;height:32px;object-fit:cover;border-radius:4px;border:1px solid var(--line);"></a>`).join('')}</div>` : ''}
           </td>
-          <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}">Edit</button><button class="del" data-del="${dateStr}">Hapus</button></td>
+          <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}">&#9999;&#65039; Edit</button><button class="del" data-del="${dateStr}">&#128465;&#65039; Hapus</button></td>
         `;
       } else {
         tr.innerHTML = `
@@ -861,7 +861,7 @@ async function renderRiwayat(container, personId, isTeamView, titleHtml){
           <td data-label="Jenis"><span class="tag libur">Libur</span></td>
           <td data-label="Jam">-</td>
           <td data-label="Kegiatan"><div class="kegiatan-preview">${escapeHtml(e.keterangan||'LIBUR')}</div></td>
-          <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}">Edit</button><button class="del" data-del="${dateStr}">Hapus</button></td>
+          <td class="row-actions" data-label="Aksi"><button class="edit" data-edit="${dateStr}">&#9999;&#65039; Edit</button><button class="del" data-del="${dateStr}">&#128465;&#65039; Hapus</button></td>
         `;
       }
       tbody.appendChild(tr);
@@ -938,14 +938,14 @@ async function renderTim(container){
   wrap.innerHTML = `
     <div class="sticky-subheader">
       <div class="view-title">
-        <div class="badge-ico"></div>
+        <div class="badge-ico">&#128101;</div>
         <div><h2>Rekap Tim</h2>
         <p>Pantau laporan seluruh anggota. Untuk membuat file Excel bulanan, buka Google Sheet lalu pilih menu <strong>Laporan Kerja &rarr; Buat Laporan Bulanan</strong>.</p></div>
       </div>
       <div class="month-nav">
         <select id="sel-bulan"></select>
         <select id="sel-tahun"></select>
-        ${SHEET_URL.indexOf('https://')===0 ? `<a href="${SHEET_URL}" target="_blank" rel="noopener"><button class="btn-secondary" type="button">Buka Google Sheet</button></a>` : ''}
+        ${SHEET_URL.indexOf('https://')===0 ? `<a href="${SHEET_URL}" target="_blank" rel="noopener"><button class="btn-secondary" type="button">Buka Google Sheet &#8599;</button></a>` : ''}
         <button class="btn-secondary" type="button" id="btn-cek-versi">Cek Koneksi Backend</button>
       </div>
     </div>
@@ -966,7 +966,7 @@ async function renderTim(container){
       const res = await fetch(`${WEB_APP_URL}?action=version`);
       const data = await res.json();
       if(data.ok){
-        infoEl.innerHTML = `<p style="color:var(--ok);">Terhubung. Versi backend: <strong>${data.version}</strong><br>Waktu server: ${data.waktuServer}</p>`;
+        infoEl.innerHTML = `<p style="color:var(--ok);">&#9989; Terhubung. Versi backend: <strong>${data.version}</strong><br>Waktu server: ${data.waktuServer}</p>`;
       } else {
         infoEl.innerHTML = `<p style="color:var(--libur);">Backend merespons tapi error: ${data.error}</p>`;
       }
@@ -1040,7 +1040,7 @@ async function render(){
   if(!currentPerson()){
     main.innerHTML = `
       <div class="view-title">
-        <div class="badge-ico"></div>
+        <div class="badge-ico">&#128075;</div>
         <div><h2>Selamat datang</h2>
         <p>Pilih nama Anda di sebelah kiri, lalu masukkan PIN untuk mulai mengisi laporan.</p></div>
       </div>
@@ -1053,7 +1053,7 @@ async function render(){
   } else if(state.tab === 'isi'){
     renderIsiLaporan(main);
   } else if(state.tab === 'riwayat'){
-    const titleHtml = `<div class="view-title"><div class="badge-ico"></div><div><h2>Riwayat Laporan Saya</h2><p>${currentPerson().nama} - ${currentPerson().jabatan}</p></div></div>`;
+    const titleHtml = `<div class="view-title"><div class="badge-ico">&#128197;</div><div><h2>Riwayat Laporan Saya</h2><p>${currentPerson().nama} - ${currentPerson().jabatan}</p></div></div>`;
     await renderRiwayat(main, state.personId, false, titleHtml);
   } else if(state.tab === 'tim'){
     await renderTim(main);
@@ -1073,10 +1073,10 @@ async function renderBeranda(container){
   wrap.innerHTML = `
     <div class="cta-banner">
       <div>
-        <h3>${sapaan}, ${p.nama.split(',')[0]}</h3>
+        <h3>${sapaan}, ${p.nama.split(',')[0]} &#128075;</h3>
         <p>Jangan lupa isi laporan kegiatan hari ini sebelum jam kerja berakhir.</p>
       </div>
-      <button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">Isi Laporan Sekarang</button>
+      <button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">&#128221; Isi Laporan Sekarang</button>
     </div>
     <div class="stat-grid" id="beranda-stats">
       <div class="card"><div class="empty">Memuat ringkasan...</div></div>
@@ -1097,7 +1097,7 @@ async function renderBeranda(container){
   const statsEl = wrap.querySelector('#beranda-stats');
   statsEl.innerHTML = `
     <div class="stat-card"><div class="num">${filled} / ${daysSoFar}</div><div class="label">Hari terisi bulan ini</div></div>
-    <div class="stat-card"><div class="num">${isiHariIni ? 'Ya' : '-'}</div><div class="label">Laporan hari ini</div></div>
+    <div class="stat-card"><div class="num">${isiHariIni ? '&#9989;' : '-'}</div><div class="label">Laporan hari ini</div></div>
     <div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>
   `;
 
@@ -1127,7 +1127,7 @@ async function renderPengaturan(container){
   const p = currentPerson();
   const wrap = document.createElement('div');
   wrap.innerHTML = `
-    <div class="view-title"><div class="badge-ico"></div><div><h2>Pengaturan</h2><p>${p.nama} - ${p.jabatan}</p></div></div>
+    <div class="view-title"><div class="badge-ico">&#9881;&#65039;</div><div><h2>Pengaturan</h2><p>${p.nama} - ${p.jabatan}</p></div></div>
 
     <div class="card">
       <h3 style="font-size:15px; margin-bottom:14px;">Foto Profil</h3>
