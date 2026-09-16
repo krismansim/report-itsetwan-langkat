@@ -6,21 +6,21 @@
 <title>Rekap Kerja - Tim IT DPRD Langkat</title>
 <style>
   :root{
-    --ink:#132A4C;
-    --ink2:#1C3D6E;
-    --ink-soft:#5B6B7A;
-    --paper:#F2F4F8;
+    --ink:#1B4332;
+    --ink2:#2F6B4F;
+    --ink-soft:#5C6B60;
+    --paper:#F7F9F3;
     --card:#FFFFFF;
-    --line:#E3E7EE;
-    --accent:#2F6FE4;
-    --accent-soft:#E8F0FE;
-    --gold:#B8863B;
-    --gold-soft:#F1E4C8;
-    --libur:#D0463C;
-    --libur-soft:#FBE7E5;
-    --ok:#1D8A55;
-    --ok-soft:#E1F5E9;
-    --header-bg:#EAF0F9;
+    --line:#E3E8DC;
+    --accent:#D4A017;
+    --accent-soft:#FBF0D3;
+    --gold:#D4A017;
+    --gold-soft:#FBF0D3;
+    --libur:#C0392B;
+    --libur-soft:#FBE6E3;
+    --ok:#2F8F4E;
+    --ok-soft:#E4F5E9;
+    --header-bg:#EEF6EA;
     --radius:12px;
   }
   *{box-sizing:border-box;}
@@ -56,7 +56,7 @@
   }
   nav.tabs button .ico{width:18px; text-align:center; flex-shrink:0;}
   nav.tabs button:hover{background:rgba(255,255,255,0.08);}
-  nav.tabs button.active{background:var(--accent); color:#fff; font-weight:600;}
+  nav.tabs button.active{background:var(--accent); color:var(--ink); font-weight:700;}
 
   .section-label{font-size:11px; color:#8CA0AF; text-transform:uppercase; letter-spacing:.05em; margin:0 0 4px 4px;}
   .person-list{display:flex; flex-direction:column; gap:5px;}
@@ -73,7 +73,7 @@
 
   .avatar{
     width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    font-size:12.5px; font-weight:700; color:#fff; background:var(--accent); overflow:hidden;
+    font-size:12.5px; font-weight:700; color:var(--ink); background:var(--accent); overflow:hidden;
   }
   .avatar img{width:100%; height:100%; object-fit:cover;}
   .avatar.lg{width:44px; height:44px; font-size:16px;}
@@ -85,7 +85,7 @@
   /* Top bar */
   .topbar{
     height:96px; flex-shrink:0; position:relative; overflow:hidden;
-    background:linear-gradient(100deg, rgba(19,42,76,0.88), rgba(28,61,110,0.55)), var(--ink) center/cover;
+    background:linear-gradient(100deg, rgba(27,67,50,0.88), rgba(47,107,79,0.55)), var(--ink) center/cover;
     display:flex; align-items:center; justify-content:space-between; padding:0 28px; color:#fff;
   }
   .topbar-right{display:flex; align-items:center; gap:20px; z-index:2;}
@@ -99,7 +99,7 @@
   .main-scroll{flex:1; display:flex; flex-direction:column; min-width:0;}
   .main{flex:1; padding:28px 36px 40px; max-width:1080px; width:100%;}
   .view-title{margin-bottom:20px; display:flex; align-items:center; gap:12px;}
-  .view-title .badge-ico{width:42px; height:42px; border-radius:11px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;}
+  .view-title .badge-ico{width:42px; height:42px; border-radius:11px; background:var(--accent); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;}
   .view-title h2{font-size:22px;}
   .view-title p{margin:4px 0 0; color:var(--ink-soft); font-size:13.5px;}
 
@@ -133,9 +133,9 @@
   .add-link:hover{background:var(--accent-soft);}
 
   .btn-primary{
-    background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:9px; cursor:pointer; font-size:14.5px; font-weight:600;
+    background:var(--accent); color:var(--ink); border:none; padding:11px 22px; border-radius:9px; cursor:pointer; font-size:14.5px; font-weight:700;
   }
-  .btn-primary:hover{background:#255ac2;}
+  .btn-primary:hover{background:#B98A0E;}
   .btn-secondary{
     background:#fff; color:var(--ink); border:1px solid var(--line); padding:9px 16px; border-radius:9px; cursor:pointer; font-size:14px;
   }
@@ -150,7 +150,7 @@
   td{padding:12px 10px; border-bottom:1px solid #EEF0F4; vertical-align:top;}
   tbody tr{position:relative;}
   tbody tr td:first-child{box-shadow: inset 3px 0 0 0 var(--rowbar, var(--accent));}
-  tbody tr:hover, tbody tr.row-even:hover{background:#E9F0FC;}
+  tbody tr:hover, tbody tr.row-even:hover{background:#FBF3D9;}
   .tag{display:inline-block; padding:3px 11px; border-radius:20px; font-size:12px; font-weight:600;}
   .tag.kerja{background:var(--ok-soft); color:var(--ok);}
   .tag.libur{background:var(--libur-soft); color:var(--libur);}
@@ -172,7 +172,7 @@
   .month-nav{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
   .sticky-subheader{position:sticky; top:0; background:var(--paper); z-index:20; padding-top:28px; margin-top:-28px; padding-bottom:14px;}
   table thead th{position:sticky; top:var(--thead-top, 0px); z-index:10; box-shadow:0 2px 0 var(--accent);}
-  tbody tr.row-even{background:#FAFBFD;}
+  tbody tr.row-even{background:#F8FAF4;}
   .month-nav select{min-width:130px;}
 
   .team-card{display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #EEF0F4; gap:10px;}
@@ -272,8 +272,8 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyi69I5G80gWzGxrwLw
 /* ---------------- DATA MODEL ---------------- */
 let PEOPLE = [];
 let BANNER_URL = '';
-const AVATAR_COLORS = ['#2F6FE4','#1D8A55','#B8863B','#7C3AED','#D0463C','#0891B2'];
-const ROW_BAR_COLORS = ['#1D8A55','#2F6FE4','#7C3AED'];
+const AVATAR_COLORS = ['#2F8F4E','#D4A017','#2F7D82','#6B8E23','#B9540A','#1B4332'];
+const ROW_BAR_COLORS = ['#2F8F4E','#D4A017','#2F7D82'];
 const HARI_NAMA = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const BULAN_NAMA = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
@@ -391,7 +391,7 @@ let clockTimer = null;
 function renderTopbar(){
   const topbar = document.getElementById('topbar');
   topbar.style.backgroundImage = BANNER_URL
-    ? `linear-gradient(100deg, rgba(19,42,76,0.82), rgba(28,61,110,0.45)), url('${BANNER_URL}')`
+    ? `linear-gradient(100deg, rgba(27,67,50,0.82), rgba(47,107,79,0.45)), url('${BANNER_URL}')`
     : '';
   topbar.style.backgroundSize = 'cover';
   topbar.style.backgroundPosition = 'center';
