@@ -22,6 +22,7 @@
     --ok-soft:#E4F5E9;
     --header-bg:#EEF6EA;
     --radius:12px;
+    --batik: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2764%27%20height%3D%2764%27%20viewBox%3D%270%200%2064%2064%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23D4A017%27%20stroke-width%3D%271%27%20opacity%3D%270.16%27%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2748%27%20cy%3D%2716%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2748%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2748%27%20cy%3D%2748%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%270%27%20cy%3D%2732%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2764%27%20cy%3D%2732%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%270%27%20r%3D%2711%27/%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2764%27%20r%3D%2711%27/%3E%3C/g%3E%3C/svg%3E");
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;}
@@ -38,7 +39,7 @@
   /* Sidebar */
   .sidebar{
     width:264px; flex-shrink:0;
-    background:linear-gradient(180deg, var(--ink) 0%, var(--ink2) 100%); color:#EDEFEA;
+    background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2790%27%20height%3D%2790%27%20viewBox%3D%270%200%2090%2090%27%3E%0A%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.07%29%27%20stroke-width%3D%271.1%27%3E%0A%3Cellipse%20cx%3D%2722.5%27%20cy%3D%2722.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%2845%2022.5%2022.5%29%27/%3E%0A%3Cellipse%20cx%3D%2767.5%27%20cy%3D%2722.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2067.5%2022.5%29%27/%3E%0A%3Cellipse%20cx%3D%2722.5%27%20cy%3D%2767.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2022.5%2067.5%29%27/%3E%0A%3Cellipse%20cx%3D%2767.5%27%20cy%3D%2767.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%2845%2067.5%2067.5%29%27/%3E%0A%3Cellipse%20cx%3D%2745%27%20cy%3D%2745%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%2845%2045%2045%29%27/%3E%0A%3Cellipse%20cx%3D%270%27%20cy%3D%2745%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%200%2045%29%27/%3E%0A%3Cellipse%20cx%3D%2790%27%20cy%3D%2745%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2090%2045%29%27/%3E%0A%3Cellipse%20cx%3D%2745%27%20cy%3D%270%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2045%200%29%27/%3E%0A%3Cellipse%20cx%3D%2745%27%20cy%3D%2790%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2045%2090%29%27/%3E%0A%3C/g%3E%0A%3C/svg%3E"), linear-gradient(180deg, var(--ink) 0%, var(--ink2) 100%); background-repeat:repeat, no-repeat; color:#EDEFEA;
     padding:22px 16px; display:flex; flex-direction:column; gap:22px;
     position:sticky; top:0; height:100vh; overflow-y:auto; align-self:flex-start;
   }
@@ -85,7 +86,8 @@
   /* Top bar */
   .topbar{
     height:96px; flex-shrink:0; position:relative; overflow:hidden;
-    background:linear-gradient(100deg, rgba(27,67,50,0.88), rgba(47,107,79,0.55)), var(--ink) center/cover;
+    background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2790%27%20height%3D%2790%27%20viewBox%3D%270%200%2090%2090%27%3E%0A%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.09%29%27%20stroke-width%3D%271.1%27%3E%0A%3Cellipse%20cx%3D%2722.5%27%20cy%3D%2722.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%2845%2022.5%2022.5%29%27/%3E%0A%3Cellipse%20cx%3D%2767.5%27%20cy%3D%2722.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2067.5%2022.5%29%27/%3E%0A%3Cellipse%20cx%3D%2722.5%27%20cy%3D%2767.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2022.5%2067.5%29%27/%3E%0A%3Cellipse%20cx%3D%2767.5%27%20cy%3D%2767.5%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%2845%2067.5%2067.5%29%27/%3E%0A%3Cellipse%20cx%3D%2745%27%20cy%3D%2745%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%2845%2045%2045%29%27/%3E%0A%3Cellipse%20cx%3D%270%27%20cy%3D%2745%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%200%2045%29%27/%3E%0A%3Cellipse%20cx%3D%2790%27%20cy%3D%2745%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2090%2045%29%27/%3E%0A%3Cellipse%20cx%3D%2745%27%20cy%3D%270%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2045%200%29%27/%3E%0A%3Cellipse%20cx%3D%2745%27%20cy%3D%2790%27%20rx%3D%2716%27%20ry%3D%2710%27%20transform%3D%27rotate%28-45%2045%2090%29%27/%3E%0A%3C/g%3E%0A%3C/svg%3E"), linear-gradient(100deg, rgba(27,67,50,0.88), rgba(47,107,79,0.55)), var(--ink) center/cover;
+    background-repeat:repeat, no-repeat, no-repeat;
     display:flex; align-items:center; justify-content:space-between; padding:0 28px; color:#fff;
   }
   .topbar-right{display:flex; align-items:center; gap:20px; z-index:2;}
