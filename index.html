@@ -503,8 +503,9 @@ function renderSidebar(){
     ['beranda','&#127968;','Beranda'],
     ['isi','&#128221;','Isi Laporan'],
     ['riwayat','&#128197;','Riwayat Laporan Saya'],
+    ['presensi','&#127380;','Absensi/Presensi'],
   ];
-  if(p.isLead) tabs.push(['tim','&#128101;','Laporan Tim']);
+  if(p.isLead) tabs.push(['tim','&#128202;','Laporan Tim']);
   tabs.push(['pengaturan','&#9881;&#65039;','Pengaturan']);
   tabs.forEach(([key,ico,label])=>{
     const b = document.createElement('button');
@@ -940,7 +941,7 @@ async function renderTim(container){
   wrap.innerHTML = `
     <div class="sticky-subheader">
       <div class="view-title">
-        <div class="badge-ico">&#128101;</div>
+        <div class="badge-ico">&#128202;</div>
         <div><h2>Rekap Tim</h2>
         <p>Pantau laporan seluruh anggota. Untuk membuat file Excel bulanan, buka Google Sheet lalu pilih menu <strong>Laporan Kerja &rarr; Buat Laporan Bulanan</strong>.</p></div>
       </div>
@@ -1057,6 +1058,8 @@ async function render(){
   } else if(state.tab === 'riwayat'){
     const titleHtml = `<div class="view-title"><div class="badge-ico">&#128197;</div><div><h2>Riwayat Laporan Saya</h2><p>${currentPerson().nama} - ${currentPerson().jabatan}</p></div></div>`;
     await renderRiwayat(main, state.personId, false, titleHtml);
+  } else if(state.tab === 'presensi'){
+    renderPresensiComingSoon(main);
   } else if(state.tab === 'tim'){
     await renderTim(main);
   } else if(state.tab === 'pengaturan'){
@@ -1065,6 +1068,34 @@ async function render(){
 }
 
 /* ---------------- BERANDA ---------------- */
+/* ---------------- ABSENSI/PRESENSI (masih dalam pengembangan) ---------------- */
+function renderPresensiComingSoon(container){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="view-title">
+      <div class="badge-ico">&#127380;</div>
+      <div><h2>Absensi / Presensi Digital</h2>
+      <p>Modul ini sedang dalam tahap pengembangan backend &amp; integrasi sistem.</p></div>
+    </div>
+
+    <div class="card" style="text-align:center; padding:40px 24px;">
+      <div style="font-size:44px; margin-bottom:10px;">&#128736;&#65039;</div>
+      <h3 style="font-size:19px; margin-bottom:8px;">Sedang Dalam Tahap Pengembangan</h3>
+      <p style="color:var(--ink-soft); max-width:480px; margin:0 auto 20px; font-size:14px; line-height:1.6;">
+        Modul presensi digital sedang dirancang untuk menggantikan sistem tanda tangan manual, terintegrasi penuh dengan sistem laporan kerja yang sudah berjalan saat ini.
+      </p>
+      <span style="display:inline-block; background:var(--accent-soft); color:#7A5A18; padding:6px 16px; border-radius:20px; font-size:12.5px; font-weight:700;">Status: Tahap Perencanaan Teknis</span>
+    </div>
+
+    <div class="card" style="background:var(--header-bg); border-color:var(--line);">
+      <p style="margin:0; font-size:13px; color:var(--ink-soft);">
+        <strong style="color:var(--ink);">Catatan:</strong> Halaman ini akan diperbarui secara bertahap. Sistem presensi manual (tanda tangan kertas) tetap berlaku sampai modul ini resmi diaktifkan.
+      </p>
+    </div>
+  `;
+  container.appendChild(wrap);
+}
+
 async function renderBeranda(container){
   const p = currentPerson();
   const wrap = document.createElement('div');
