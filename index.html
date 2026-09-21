@@ -1035,9 +1035,32 @@ async function renderTim(container){
 }
 
 /* ---------------- MAIN RENDER ---------------- */
+/* ---------------- SINKRONISASI URL (supaya alamat berubah tiap pindah halaman) ---------------- */
+function syncUrlHash(){
+  try{
+    if(currentPerson()){
+      const desired = '#' + state.tab;
+      if(location.hash !== desired){
+        history.pushState({tab: state.tab}, '', desired);
+      }
+    } else if(location.hash){
+      history.pushState({}, '', location.pathname + location.search);
+    }
+  }catch(e){ /* browser lama tanpa History API, abaikan saja */ }
+}
+window.addEventListener('popstate', ()=>{
+  const tabFromUrl = (location.hash || '').replace('#','');
+  if(currentPerson() && tabFromUrl){
+    state.tab = tabFromUrl;
+    state.editingKey = null;
+    render();
+  }
+});
+
 async function render(){
   renderSidebar();
   renderTopbar();
+  syncUrlHash();
   const main = document.getElementById('main');
   main.innerHTML = '';
   if(!currentPerson()){
