@@ -1032,6 +1032,7 @@ async function renderTim(container){
   selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
   selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
 
+  renderRekapPresensiTim(wrap); // kartu Presensi Tim (modul Absensi/Presensi)
   await loadSummary();
 }
 
@@ -1083,7 +1084,7 @@ async function render(){
     const titleHtml = `<div class="view-title"><div class="badge-ico">&#128197;</div><div><h2>Riwayat Laporan Saya</h2><p>${currentPerson().nama} - ${currentPerson().jabatan}</p></div></div>`;
     await renderRiwayat(main, state.personId, false, titleHtml);
   } else if(state.tab === 'presensi'){
-    renderPresensiComingSoon(main);
+    await renderAbsensi(main);
   } else if(state.tab === 'tim'){
     await renderTim(main);
   } else if(state.tab === 'pengaturan'){
@@ -1309,6 +1310,641 @@ async function init(){
 }
 
 init();
+</script>
+
+<!-- =====================================================================
+     MODUL UI ABSENSI / PRESENSI - TIM IT DPRD LANGKAT
+     Sudah ditempel langsung di index.html GitHub (sebelum </body>).
+     Memakai yang sudah ada di index.html: WEB_APP_URL, showToast,
+     currentPerson, avatarHtml, HARI_NAMA, BULAN_NAMA, pad2.
+     ===================================================================== -->
+<style>
+ .pr-h3{font-size:15.5px; margin:0 0 14px;}
+ .pr-alert{background:#FFF7E0; border:1px solid #F1D48A; color:#6B4E00; border-radius:10px; padding:10px 14px; margin-bottom:16px; font-size:13.5px;}
+ .pr-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-bottom:20px;}
+ .pr-tile{background:var(--card,#fff); border:1px solid var(--line,#E3E7EE); border-radius:var(--radius,12px); padding:16px 18px; display:flex; gap:14px; align-items:center; box-shadow:0 1px 3px rgba(20,40,70,.04);}
+ .pr-thumb{width:64px; height:85px; border-radius:10px; object-fit:cover; background:#EEF1F5; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:26px;}
+ .pr-label{font-size:12.5px; color:var(--ink-soft,#5B6B7A); font-weight:600;}
+ .pr-jam{font-size:26px; font-weight:700; line-height:1.25; color:var(--ink,#132A4C);}
+ .pr-jam small{font-size:12px; font-weight:600; color:var(--ink-soft,#5B6B7A);}
+ .pr-muted{color:var(--ink-soft,#5B6B7A);}
+ .pr-badges{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+ .pr-badge{display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; text-decoration:none; white-space:nowrap;}
+ .pr-badge.ok{background:#E1F5E9; color:#1D8A55;}
+ .pr-badge.warn{background:#FFF1D6; color:#A15C00;}
+ .pr-badge.bad{background:#FBE7E5; color:#C0392B;}
+ .pr-badge.info{background:#E8F0FE; color:#2F6FE4;}
+ .pr-langkah{display:flex; gap:14px; padding:14px 0; border-bottom:1px dashed var(--line,#E3E7EE);}
+ .pr-no{width:28px; height:28px; border-radius:50%; background:var(--accent,#2F6FE4); color:var(--ink,#fff); font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;}
+ .pr-langkah-isi{flex:1; min-width:0;}
+ .pr-langkah-judul{font-weight:700; margin-bottom:8px;}
+ .pr-lokasi{padding:10px 12px; border-radius:10px; background:#F4F6F9; font-size:13.5px; margin-bottom:8px;}
+ .pr-lokasi.ok{background:#E1F5E9; color:#14633D;}
+ .pr-lokasi.warn{background:#FFF1D6; color:#7A4600;}
+ .pr-lokasi.bad{background:#FBE7E5; color:#A33126;}
+ .pr-lokasi a{color:inherit;}
+ .pr-kecil-teks{font-size:12px; margin-top:4px;}
+ .pr-kecil{padding:6px 12px !important; font-size:13px !important;}
+ .pr-kamera{position:relative; display:flex; align-items:center; justify-content:center; gap:8px; border:2px dashed var(--accent,#2F6FE4); border-radius:12px; padding:16px; cursor:pointer; font-weight:600; color:var(--ink,#2F6FE4); background:var(--accent-soft,#E8F0FE); max-width:360px;}
+ .pr-kamera input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;}
+ .pr-preview{display:block; width:180px; max-width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:12px; margin-top:10px; border:1px solid var(--line,#E3E7EE);}
+ .pr-tombol-besar{width:100%; margin-top:18px; padding:15px !important; font-size:16.5px !important;}
+ .pr-tombol-besar:disabled{opacity:.5; cursor:not-allowed;}
+ .pr-info-siap{font-size:12.5px; color:var(--ink-soft,#5B6B7A); text-align:center; margin-top:6px; min-height:16px;}
+ .pr-catatan{font-size:12px; color:var(--ink-soft,#5B6B7A); margin:8px 0 0; text-align:center;}
+ .pr-link-btn{background:none; border:none; color:var(--ink2,#2F6FE4); cursor:pointer; font-size:13px; text-decoration:underline; padding:4px 0; margin-top:8px;}
+ .pr-izin summary{cursor:pointer; font-weight:600;}
+ .pr-izin-isi{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-top:14px;}
+ .pr-izin-isi .field{margin-bottom:0;}
+ .pr-selesai{background:#E1F5E9 !important; border-color:#BFE6CF !important; color:#14633D; font-size:15px;}
+ .pr-scroll{overflow-x:auto;}
+ .pr-tabel td{vertical-align:middle;}
+ .pr-sel{display:flex; gap:8px; align-items:center;}
+ .pr-mini{width:34px; height:45px; object-fit:cover; border-radius:6px; border:1px solid var(--line,#E3E7EE); display:block;}
+ .pr-teks-warn{color:#A15C00;} .pr-teks-ok{color:#1D8A55;}
+ .pr-overlay{position:fixed; inset:0; background:rgba(20,25,35,.55); display:flex; align-items:center; justify-content:center; z-index:1500; padding:16px;}
+ .pr-modal{background:var(--card,#fff); border-radius:14px; padding:22px 24px; width:400px; max-width:100%; box-shadow:0 20px 50px rgba(0,0,0,.25); font-size:14.5px;}
+ .pr-modal ul{margin:8px 0 0; padding-left:20px;}
+ .pr-modal-aksi{display:flex; gap:8px; margin-top:18px;}
+ .pr-modal-aksi button{flex:1;}
+ .pr-tim-head{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+ .pr-tim-kontrol{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+ .pr-export{margin-top:22px; padding-top:18px; border-top:1px solid var(--line,#E3E7EE);}
+ .pr-export-kontrol{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px;}
+ .pr-angka-warn{color:#A15C00; font-weight:700;}
+ .pr-angka-bad{color:#C0392B; font-weight:700;}
+ .pr-orang{display:flex; align-items:center; gap:10px;}
+ @media (max-width:640px){ .pr-tabel td[colspan]{display:block;} .pr-tim-kontrol, .pr-export-kontrol{flex-direction:column; align-items:stretch;} }
+ @media (max-width:600px){ .pr-jam{font-size:22px;} .pr-langkah{gap:10px;} .pr-thumb{width:54px; height:72px;} }
+</style>
+
+<script>
+/* ======================= KONEKSI KE BACKEND =======================
+   Di GitHub: POST ke WEB_APP_URL { action:'presensi', fn, args }.
+   Jika dibuka langsung dari URL /exec Apps Script: pakai google.script.run. */
+async function prCallServer(fn, ...args){
+ if(typeof google !== 'undefined' && google.script && google.script.run){
+ return new Promise((resolve, reject) => {
+ google.script.run.withSuccessHandler(resolve)
+ .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[fn](...args);
+ });
+ }
+ if(typeof WEB_APP_URL === 'undefined' || String(WEB_APP_URL).indexOf('https://') !== 0) throw new Error('WEB_APP_URL belum diisi.');
+ let res;
+ try{
+ res = await fetch(WEB_APP_URL, {
+ method:'POST',
+ headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+ body: JSON.stringify({ action:'presensi', fn, args })
+ });
+ }catch(e){ throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet.'); }
+ const teks = await res.text();
+ try{ return JSON.parse(teks); }
+ catch(e){ throw new Error('Respons server tidak valid. Pastikan Code.gs & Presensi.gs sudah di-deploy versi baru.'); }
+}
+
+/* ======================= STATE & UTILITAS ======================= */
+const PR_STATE = { data:null, lokasi:null, fotoAsli:null, sedangKirim:false, offsetMs:0, container:null };
+
+function prEsc(s){
+ return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function prJarak(lat1, lng1, lat2, lng2){
+ const R = 6371000, rad = x => x * Math.PI / 180;
+ const dLat = rad(lat2 - lat1), dLng = rad(lng2 - lng1);
+ const a = Math.sin(dLat/2)**2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng/2)**2;
+ return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+function prFormatJarak(m){
+ m = Number(m) || 0;
+ return m >= 1000 ? (m/1000).toFixed(1).replace('.', ',') + ' km' : m + ' m';
+}
+function prMapsUrl(lat, lng){
+ return (lat === null || lat === undefined) ? '#' : `https://www.google.com/maps?q=${lat},${lng}`;
+}
+function prSekarangMs(){ return Date.now() + (PR_STATE.offsetMs || 0); }
+// Waktu WIB (UTC+7) tanpa tergantung zona waktu HP
+function prWIB(ms){
+ const d = new Date((ms === undefined ? prSekarangMs() : ms) + 7 * 3600000);
+ const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1, dd = d.getUTCDate();
+ return { y, m, d:dd, dow:d.getUTCDay(), hh:d.getUTCHours(), mi:d.getUTCMinutes(),
+ tanggal:`${y}-${String(m).padStart(2,'0')}-${String(dd).padStart(2,'0')}` };
+}
+function prMenit(hhmm){ const p = String(hhmm || '').split(/[:.]/).map(Number); return (p[0]||0) * 60 + (p[1]||0); }
+function prLabelTanggal(tg){
+ const [y, m, d] = tg.split('-').map(Number);
+ const dow = new Date(y, m - 1, d).getDay();
+ return `${String(d).padStart(2,'0')} ${BULAN_NAMA[m-1].slice(0,3)} · ${HARI_NAMA[dow]}`;
+}
+
+function prKonfirmasi(pesanHtml, labelOk){
+ return new Promise(resolve => {
+ const ov = document.createElement('div');
+ ov.className = 'pr-overlay';
+ ov.innerHTML = `<div class="pr-modal"><div>${pesanHtml}</div>
+ <div class="pr-modal-aksi"><button type="button" class="btn-secondary" data-x="0">Batal</button>
+ <button type="button" class="btn-primary" data-x="1">${prEsc(labelOk || 'Lanjutkan')}</button></div></div>`;
+ document.body.appendChild(ov);
+ const tutup = v => { ov.remove(); resolve(v); };
+ ov.addEventListener('click', e => {
+ if(e.target === ov) return tutup(false);
+ const b = e.target.closest('[data-x]');
+ if(b) tutup(b.dataset.x === '1');
+ });
+ });
+}
+
+/* ======================= GPS ======================= */
+function prAmbilLokasi(){
+ return new Promise((resolve, reject) => {
+ if(!('geolocation' in navigator)) return reject(new Error('Browser/perangkat ini tidak mendukung GPS.'));
+ const sukses = pos => resolve({ lat:pos.coords.latitude, lng:pos.coords.longitude,
+ akurasi:Math.round(pos.coords.accuracy || 0), waktu:Date.now() });
+ const pesan = err => {
+ if(err && err.code === 1) return 'Izin lokasi ditolak. Izinkan akses lokasi untuk situs ini di pengaturan browser, lalu tekan "Perbarui lokasi".';
+ if(err && err.code === 3) return 'Waktu mendeteksi lokasi habis. Pastikan GPS aktif, lalu coba lagi.';
+ return 'Lokasi tidak dapat dideteksi. Pastikan GPS/Location di HP aktif.';
+ };
+ navigator.geolocation.getCurrentPosition(sukses, err => {
+ if(err && err.code === 1) return reject(new Error(pesan(err)));
+ // coba ulang dengan akurasi normal (lebih cepat di dalam gedung)
+ navigator.geolocation.getCurrentPosition(sukses, err2 => reject(new Error(pesan(err2))),
+ { enableHighAccuracy:false, timeout:15000, maximumAge:60000 });
+ }, { enableHighAccuracy:true, timeout:20000, maximumAge:0 });
+ });
+}
+
+/* ======================= FOTO SELFIE ======================= */
+function prMuatGambar(src){
+ return new Promise((res, rej) => {
+ const img = new Image();
+ img.onload = () => res(img);
+ img.onerror = () => rej(new Error('File bukan gambar yang valid.'));
+ img.src = src;
+ });
+}
+// Potong tengah jadi potret 3:4 (480x640) supaya ringan & seragam
+async function prPotongFoto(file){
+ const url = URL.createObjectURL(file);
+ try{
+ const img = await prMuatGambar(url);
+ const W = 480, H = 640, rasio = W / H;
+ let sw = img.naturalWidth, sh = img.naturalHeight, sx = 0, sy = 0;
+ if(sw / sh > rasio){ const nw = sh * rasio; sx = (sw - nw) / 2; sw = nw; }
+ else { const nh = sw / rasio; sy = (sh - nh) / 2; sh = nh; }
+ const c = document.createElement('canvas');
+ c.width = W; c.height = H;
+ c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+ return c.toDataURL('image/jpeg', 0.85);
+ } finally { URL.revokeObjectURL(url); }
+}
+// Tempel stempel nama, waktu & koordinat di bagian bawah foto
+async function prWatermark(dataUrl, baris){
+ const img = await prMuatGambar(dataUrl);
+ const c = document.createElement('canvas');
+ c.width = img.naturalWidth; c.height = img.naturalHeight;
+ const ctx = c.getContext('2d');
+ ctx.drawImage(img, 0, 0);
+ const fs = Math.round(c.width / 27), lh = fs * 1.35, pad = Math.round(fs * 0.6);
+ const tinggi = baris.length * lh + pad * 2;
+ ctx.fillStyle = 'rgba(0,0,0,0.55)';
+ ctx.fillRect(0, c.height - tinggi, c.width, tinggi);
+ ctx.fillStyle = '#FFFFFF';
+ ctx.textBaseline = 'top';
+ baris.forEach((t, i) => {
+ ctx.font = (i === 0 ? 'bold ' : '') + fs + 'px Arial, sans-serif';
+ ctx.fillText(t, pad, c.height - tinggi + pad + i * lh, c.width - pad * 2);
+ });
+ return c.toDataURL('image/jpeg', 0.8);
+}
+
+/* ======================= HALAMAN ABSENSI / PRESENSI ======================= */
+async function renderAbsensi(container){
+ const p = currentPerson();
+ if(!p) return;
+ PR_STATE.container = container;
+ PR_STATE.fotoAsli = null;
+ PR_STATE.lokasi = null;
+ PR_STATE.sedangKirim = false;
+
+ const wrap = document.createElement('div');
+ wrap.innerHTML = `
+ <div class="view-title">
+ <div class="badge-ico">🆔</div>
+ <div><h2>Absensi / Presensi Digital</h2><p id="pr-subjudul">Memuat…</p></div>
+ </div>
+ <div id="pr-isi"><div class="card"><div class="empty">Memuat data presensi…</div></div></div>`;
+ container.appendChild(wrap);
+
+ let res;
+ try{ res = await prCallServer('apiPresensiHariIni', p.id); }
+ catch(e){ res = { ok:false, error:e.message }; }
+ const isi = wrap.querySelector('#pr-isi');
+ if(!res || !res.ok){
+ isi.innerHTML = `<div class="card"><div class="empty" style="color:var(--libur,#D0463C)">Gagal memuat presensi: ${prEsc(res && res.error)}.<br>Pastikan file <b>Presensi.gs</b> sudah ditambahkan dan Web App sudah di-deploy ulang (versi baru).</div></div>`;
+ return;
+ }
+ PR_STATE.data = res;
+ PR_STATE.offsetMs = (res.waktuServerMs || Date.now()) - Date.now();
+ wrap.querySelector('#pr-subjudul').innerHTML = `${prEsc(res.hariIni.label)} &middot; ${prEsc(p.nama)}`;
+ prGambarHalaman(isi, p);
+}
+
+function prMuatUlangAbsensi(){
+ const c = PR_STATE.container;
+ if(!c) return;
+ c.innerHTML = '';
+ renderAbsensi(c);
+}
+
+function prAksiBerikut(rec){
+ if(rec && rec.status !== 'HADIR') return 'izin';
+ if(!rec || (!rec.masuk && !rec.pulang)) return 'masuk';
+ if(rec.masuk && !rec.pulang) return 'pulang';
+ return 'selesai';
+}
+
+function prBadgeLokasi(x){
+ const link = prMapsUrl(x.lat, x.lng);
+ return x.diLuar
+ ? `<a class="pr-badge warn" href="${link}" target="_blank" rel="noopener">⚠️ Di luar lokasi kantor · ${prFormatJarak(x.jarak)}</a>`
+ : `<a class="pr-badge ok" href="${link}" target="_blank" rel="noopener">✅ Di kantor · ${prFormatJarak(x.jarak)}</a>`;
+}
+
+function prTileHtml(judul, x, flag){
+ if(!x){
+ return `<div class="pr-tile"><div class="pr-thumb">⏳</div><div><div class="pr-label">${judul}</div><div class="pr-jam pr-muted">Belum</div></div></div>`;
+ }
+ return `<div class="pr-tile">
+ <a href="${prEsc(x.fotoUrl)}" target="_blank" rel="noopener"><img class="pr-thumb" src="${prEsc(x.fotoUrl)}" alt="Selfie"></a>
+ <div><div class="pr-label">${judul}</div>
+ <div class="pr-jam">${prEsc(String(x.jam).slice(0,5))} <small>WIB</small></div>
+ <div class="pr-badges">${prBadgeLokasi(x)}${flag ? ` <span class="pr-badge bad">${prEsc(flag)}</span>` : ''}</div></div>
+ </div>`;
+}
+
+function prGambarHalaman(isi, p){
+ const d = PR_STATE.data, rec = d.record;
+ const aksi = prAksiBerikut(rec);
+ let atas;
+ if(aksi === 'izin'){
+ atas = `<div class="card">
+ <div class="pr-label">Status kehadiran hari ini</div>
+ <div class="pr-jam">${prEsc(rec.status)}</div>
+ <div class="pr-muted" style="margin:4px 0 12px;">${prEsc(rec.keterangan || '')}</div>
+ <button type="button" class="btn-secondary pr-kecil" id="pr-btn-batal-izin">Batalkan keterangan ini</button>
+ </div>`;
+ } else {
+ atas = `<div class="pr-grid">
+ ${prTileHtml('☀️ Absen Masuk', rec && rec.masuk, rec && rec.terlambat ? 'Terlambat' : '')}
+ ${prTileHtml('🌙 Absen Pulang', rec && rec.pulang, rec && rec.pulangCepat ? 'Pulang cepat' : '')}
+ </div>`;
+ }
+ isi.innerHTML = `
+ ${d.hariIni.libur ? `<div class="pr-alert">📅 Hari ini ${prEsc(d.hariIni.libur)}. Presensi tetap bisa diisi bila Anda bertugas.</div>` : ''}
+ ${atas}
+ <div id="pr-aksi"></div>
+ <div class="card"><h3 class="pr-h3">🗓️ Riwayat Presensi Bulan Ini</h3><div id="pr-riwayat-isi"><div class="empty">Memuat…</div></div></div>`;
+
+ const aksiEl = isi.querySelector('#pr-aksi');
+ if(aksi === 'masuk' || aksi === 'pulang') prFormAbsen(aksiEl, p, aksi);
+ else if(aksi === 'selesai') aksiEl.innerHTML = `<div class="card pr-selesai">✅ <b>Presensi hari ini sudah lengkap.</b> Terima kasih!</div>`;
+
+ const batal = isi.querySelector('#pr-btn-batal-izin');
+ if(batal) batal.addEventListener('click', async () => {
+ const ok = await prKonfirmasi('Batalkan keterangan <b>' + prEsc(rec.status) + '</b> hari ini? Setelah itu Anda bisa absen seperti biasa.', 'Ya, batalkan');
+ if(!ok) return;
+ try{
+ const r = await prCallServer('apiPresensiBatalIzin', p.id);
+ if(!r.ok) throw new Error(r.error);
+ showToast('Keterangan dibatalkan');
+ prMuatUlangAbsensi();
+ }catch(e){ showToast('Gagal: ' + e.message); }
+ });
+
+ prMuatRiwayat(isi.querySelector('#pr-riwayat-isi'), p);
+}
+
+function prFormAbsen(el, p, tipe){
+ const cfg = PR_STATE.data.config, rec = PR_STATE.data.record;
+ PR_STATE.fotoAsli = null;
+ const label = tipe === 'masuk' ? 'Absen Masuk' : 'Absen Pulang';
+ const bolehLangsungPulang = tipe === 'masuk' && prWIB().hh >= 12;
+ const tanpaMasuk = tipe === 'pulang' && !(rec && rec.masuk);
+
+ el.innerHTML = `
+ <div class="card">
+ <h3 class="pr-h3">${tipe === 'masuk' ? '☀️' : '🌙'} ${label}${tanpaMasuk ? ' <span class="pr-badge bad">tanpa absen masuk</span>' : ''}</h3>
+ <div class="pr-langkah">
+ <div class="pr-no">1</div>
+ <div class="pr-langkah-isi">
+ <div class="pr-langkah-judul">Lokasi GPS</div>
+ <div id="pr-lokasi" class="pr-lokasi">📡 Mendeteksi lokasi…</div>
+ <button type="button" class="btn-secondary pr-kecil" id="pr-btn-lokasi">🔄 Perbarui lokasi</button>
+ </div>
+ </div>
+ <div class="pr-langkah" style="border-bottom:none;">
+ <div class="pr-no">2</div>
+ <div class="pr-langkah-isi">
+ <div class="pr-langkah-judul">Foto Selfie</div>
+ <label class="pr-kamera"><input type="file" accept="image/*" capture="user" id="pr-foto"><span id="pr-teks-kamera">📷 Ambil Foto Selfie</span></label>
+ <div id="pr-foto-preview"></div>
+ </div>
+ </div>
+ <button type="button" class="btn-primary pr-tombol-besar" id="pr-btn-kirim" disabled>${label} Sekarang</button>
+ <div class="pr-info-siap" id="pr-info-siap"></div>
+ <p class="pr-catatan">Jam absen dicatat otomatis oleh server (WIB), bukan dari jam HP. Radius kantor ${cfg.radiusMeter} m.</p>
+ ${bolehLangsungPulang ? `<div style="text-align:center;"><button type="button" class="pr-link-btn" id="pr-btn-langsung-pulang">Lupa absen masuk? Langsung absen pulang</button></div>` : ''}
+ </div>
+ ${tipe === 'masuk' ? `
+ <details class="card pr-izin">
+ <summary>🙋 Tidak bisa hadir hari ini? Ajukan Izin / Sakit / Cuti / Dinas Luar</summary>
+ <div class="pr-izin-isi">
+ <div class="field"><label>Jenis</label>
+ <select id="pr-izin-jenis"><option>IZIN</option><option>SAKIT</option><option>CUTI</option><option>DINAS LUAR</option></select></div>
+ <div class="field" style="flex:1; min-width:220px;"><label>Keterangan</label>
+ <textarea id="pr-izin-ket" rows="2" placeholder="Contoh: Sakit demam, surat dokter menyusul / Dinas ke Medan"></textarea></div>
+ <button type="button" class="btn-secondary" id="pr-btn-izin">Kirim Keterangan</button>
+ </div>
+ </details>` : ''}`;
+
+ el.querySelector('#pr-btn-lokasi').addEventListener('click', () => prPerbaruiLokasi(el));
+
+ el.querySelector('#pr-foto').addEventListener('change', async e => {
+ const f = e.target.files && e.target.files[0];
+ if(!f) return;
+ const prev = el.querySelector('#pr-foto-preview');
+ prev.innerHTML = '<div class="pr-kecil-teks pr-muted">Memproses foto…</div>';
+ try{
+ // tolak foto lama dari galeri: foto harus diambil langsung (maks. 15 menit lalu)
+ if(f.lastModified && Date.now() - f.lastModified > 15 * 60 * 1000){
+ throw new Error('Foto harus diambil langsung dari kamera saat ini, bukan foto lama dari galeri.');
+ }
+ PR_STATE.fotoAsli = await prPotongFoto(f);
+ prev.innerHTML = `<img src="${PR_STATE.fotoAsli}" class="pr-preview" alt="Selfie">`;
+ el.querySelector('#pr-teks-kamera').textContent = '📷 Ulangi Foto';
+ }catch(err){
+ PR_STATE.fotoAsli = null;
+ prev.innerHTML = `<div class="pr-lokasi bad">❌ ${prEsc(err.message)}</div>`;
+ }
+ e.target.value = '';
+ prCekSiap(el);
+ });
+
+ el.querySelector('#pr-btn-kirim').addEventListener('click', () => prKirimAbsen(el, p, tipe));
+
+ const langsung = el.querySelector('#pr-btn-langsung-pulang');
+ if(langsung) langsung.addEventListener('click', () => prFormAbsen(el, p, 'pulang'));
+
+ const izinBtn = el.querySelector('#pr-btn-izin');
+ if(izinBtn) izinBtn.addEventListener('click', async () => {
+ const jenis = el.querySelector('#pr-izin-jenis').value;
+ const ket = el.querySelector('#pr-izin-ket').value.trim();
+ if(!ket){ showToast('Tuliskan keterangan singkat'); return; }
+ const ok = await prKonfirmasi(`Catat hari ini sebagai <b>${prEsc(jenis)}</b>?<br><span class="pr-muted">${prEsc(ket)}</span>`, 'Ya, kirim');
+ if(!ok) return;
+ izinBtn.disabled = true;
+ try{
+ const r = await prCallServer('apiPresensiIzin', p.id, jenis, ket);
+ if(!r.ok) throw new Error(r.error);
+ showToast('Keterangan ' + jenis + ' tersimpan');
+ prMuatUlangAbsensi();
+ }catch(err){ showToast('Gagal: ' + err.message); izinBtn.disabled = false; }
+ });
+
+ prCekSiap(el);
+ prPerbaruiLokasi(el);
+}
+
+async function prPerbaruiLokasi(el){
+ const box = el.querySelector('#pr-lokasi');
+ if(!box) return;
+ const cfg = PR_STATE.data.config;
+ PR_STATE.lokasi = null;
+ prCekSiap(el);
+ box.className = 'pr-lokasi';
+ box.innerHTML = '📡 Mendeteksi lokasi… (pastikan GPS aktif & izinkan akses lokasi)';
+ try{
+ const lok = await prAmbilLokasi();
+ lok.jarak = Math.round(prJarak(lok.lat, lok.lng, cfg.kantorLat, cfg.kantorLng));
+ lok.diLuar = lok.jarak > cfg.radiusMeter;
+ if(!box.isConnected) return;
+ PR_STATE.lokasi = lok;
+ box.className = 'pr-lokasi ' + (lok.diLuar ? 'warn' : 'ok');
+ box.innerHTML = (lok.diLuar
+ ? `⚠️ <b>Di luar lokasi kantor</b> — ${prFormatJarak(lok.jarak)} dari kantor (batas ${cfg.radiusMeter} m). Anda tetap bisa absen, tetapi akan ditandai untuk dicek Team Leader.`
+ : `✅ <b>Anda berada di area kantor</b> — ${prFormatJarak(lok.jarak)} dari titik kantor.`)
+ + `<div class="pr-kecil-teks">Akurasi GPS ±${lok.akurasi} m · <a href="${prMapsUrl(lok.lat, lok.lng)}" target="_blank" rel="noopener">Lihat di peta</a></div>`
+ + (lok.akurasi > 150 ? `<div class="pr-kecil-teks">Akurasi masih rendah. Coba dekat jendela / area terbuka lalu tekan "Perbarui lokasi".</div>` : '');
+ }catch(e){
+ if(!box.isConnected) return;
+ box.className = 'pr-lokasi bad';
+ box.innerHTML = `❌ ${prEsc(e.message)}`;
+ }
+ prCekSiap(el);
+}
+
+function prCekSiap(el){
+ const btn = el.querySelector('#pr-btn-kirim');
+ if(!btn) return;
+ const kurang = [];
+ if(!PR_STATE.lokasi) kurang.push('lokasi GPS');
+ if(!PR_STATE.fotoAsli) kurang.push('foto selfie');
+ btn.disabled = kurang.length > 0 || PR_STATE.sedangKirim;
+ const info = el.querySelector('#pr-info-siap');
+ if(info) info.textContent = PR_STATE.sedangKirim ? '' : (kurang.length ? 'Lengkapi dulu: ' + kurang.join(' & ') : 'Siap dikirim');
+}
+
+async function prKirimAbsen(el, p, tipe){
+ if(PR_STATE.sedangKirim || !PR_STATE.lokasi || !PR_STATE.fotoAsli) return;
+ const cfg = PR_STATE.data.config, rec = PR_STATE.data.record;
+
+ // lokasi lebih dari 5 menit -> ambil ulang supaya akurat
+ if(Date.now() - PR_STATE.lokasi.waktu > 5 * 60 * 1000){
+ showToast('Memperbarui lokasi…');
+ await prPerbaruiLokasi(el);
+ if(!PR_STATE.lokasi) return;
+ }
+ const L = PR_STATE.lokasi;
+ const w = prWIB();
+
+ const peringatan = [];
+ if(L.diLuar) peringatan.push(`Anda berada <b>${prFormatJarak(L.jarak)}</b> dari kantor (di luar radius ${cfg.radiusMeter} m). Absen akan ditandai <b>⚠️ Di luar lokasi kantor</b>.`);
+ if(tipe === 'pulang' && !(rec && rec.masuk)) peringatan.push('Anda <b>belum absen masuk</b> hari ini. Absen pulang tetap dicatat dengan catatan "Tidak absen masuk".');
+ if(tipe === 'pulang' && !PR_STATE.data.hariIni.akhirPekan && (w.hh * 60 + w.mi) < prMenit(cfg.jamPulang)) peringatan.push(`Sekarang belum jam pulang (${cfg.jamPulang} WIB). Absen akan ditandai <b>Pulang cepat</b>.`);
+ if(peringatan.length){
+ const ok = await prKonfirmasi('<b>Perhatian:</b><ul>' + peringatan.map(t => `<li>${t}</li>`).join('') + '</ul><p style="margin:12px 0 0;">Tetap lanjutkan absen?</p>', 'Ya, tetap absen');
+ if(!ok) return;
+ }
+
+ PR_STATE.sedangKirim = true;
+ prCekSiap(el);
+ const btn = el.querySelector('#pr-btn-kirim');
+ const labelAsli = btn.textContent;
+ btn.textContent = '⏳ Mengirim presensi…';
+ try{
+ const foto = await prWatermark(PR_STATE.fotoAsli, [
+ `${p.nama} · ABSEN ${tipe.toUpperCase()}`,
+ `${HARI_NAMA[w.dow]}, ${w.d} ${BULAN_NAMA[w.m-1]} ${w.y} · ${pad2(w.hh)}:${pad2(w.mi)} WIB`,
+ `${L.lat.toFixed(6)}, ${L.lng.toFixed(6)} (±${L.akurasi} m)`,
+ `${prFormatJarak(L.jarak)} dari kantor${L.diLuar ? ' · DI LUAR RADIUS' : ''}`,
+ ]);
+ const res = await prCallServer('apiPresensiAbsen', p.id, tipe, {
+ lat:L.lat, lng:L.lng, akurasi:L.akurasi, foto, perangkat:navigator.userAgent
+ });
+ if(!res || !res.ok) throw new Error((res && res.error) || 'Gagal menyimpan presensi');
+ const bag = res.record[tipe];
+ showToast(`✅ ${label(tipe)} tercatat pukul ${bag ? String(bag.jam).slice(0,5) : ''} WIB`);
+ PR_STATE.sedangKirim = false;
+ prMuatUlangAbsensi();
+ }catch(e){
+ PR_STATE.sedangKirim = false;
+ btn.textContent = labelAsli;
+ prCekSiap(el);
+ showToast('Gagal: ' + e.message);
+ }
+ function label(t){ return t === 'masuk' ? 'Absen masuk' : 'Absen pulang'; }
+}
+
+/* ---------- Tampilan sel & catatan (dipakai riwayat & tampilan tim) ---------- */
+function prSelJam(x){
+ if(!x) return '<span class="pr-muted">—</span>';
+ return `<div class="pr-sel">
+ ${x.fotoUrl ? `<a href="${prEsc(x.fotoUrl)}" target="_blank" rel="noopener"><img class="pr-mini" src="${prEsc(x.fotoUrl)}" alt="" loading="lazy"></a>` : ''}
+ <div><b>${prEsc(String(x.jam).slice(0,5))}</b><br>
+ <a class="pr-kecil-teks ${x.diLuar ? 'pr-teks-warn' : 'pr-teks-ok'}" href="${prMapsUrl(x.lat, x.lng)}" target="_blank" rel="noopener">${x.diLuar ? '⚠️ ' : '📍 '}${prFormatJarak(x.jarak)}</a></div>
+ </div>`;
+}
+function prFlagsHtml(r, lampau){
+ const b = [];
+ if(r.masuk && r.masuk.diLuar) b.push('<span class="pr-badge warn">⚠️ Masuk di luar lokasi kantor</span>');
+ if(r.pulang && r.pulang.diLuar) b.push('<span class="pr-badge warn">⚠️ Pulang di luar lokasi kantor</span>');
+ if(r.terlambat) b.push('<span class="pr-badge bad">Terlambat</span>');
+ if(r.pulangCepat) b.push('<span class="pr-badge warn">Pulang cepat</span>');
+ if(r.masuk && !r.pulang && lampau) b.push('<span class="pr-badge bad">Tidak absen pulang</span>');
+ if(!r.masuk && r.pulang) b.push('<span class="pr-badge bad">Tidak absen masuk</span>');
+ if(b.length) return `<div class="pr-badges" style="margin:0;">${b.join('')}</div>`;
+ return (r.masuk && r.pulang) ? '<span class="pr-badge ok">✓ Sesuai</span>' : '<span class="pr-muted">—</span>';
+}
+
+async function prMuatRiwayat(box, p){
+ const [y, m] = PR_STATE.data.hariIni.tanggal.split('-').map(Number);
+ let res;
+ try{ res = await prCallServer('apiPresensiBulan', p.id, y, m); }
+ catch(e){ res = { ok:false, error:e.message }; }
+ if(!box || !box.isConnected) return;
+ if(!res || !res.ok){ box.innerHTML = `<div class="empty">Gagal memuat riwayat: ${prEsc(res && res.error)}</div>`; return; }
+ const list = res.data || [];
+ if(!list.length){ box.innerHTML = '<div class="empty">Belum ada data presensi bulan ini.</div>'; return; }
+ box.innerHTML = `<div class="pr-scroll"><table class="pr-tabel">
+ <thead><tr><th>Tanggal</th><th>Masuk</th><th>Pulang</th><th>Catatan</th></tr></thead>
+ <tbody>${list.map(r => r.status !== 'HADIR'
+ ? `<tr><td data-label="Tanggal">${prLabelTanggal(r.tanggal)}</td><td colspan="2" data-label="Status"><span class="pr-badge info">${prEsc(r.status)}</span></td><td data-label="Keterangan">${prEsc(r.keterangan)}</td></tr>`
+ : `<tr><td data-label="Tanggal">${prLabelTanggal(r.tanggal)}</td><td data-label="Masuk">${prSelJam(r.masuk)}</td><td data-label="Pulang">${prSelJam(r.pulang)}</td><td data-label="Catatan">${prFlagsHtml(r, r.tanggal < res.hariIni)}</td></tr>`
+ ).join('')}</tbody></table></div>`;
+}
+
+/* ======================= PANEL TEAM LEADER (di tab Laporan Tim) ======================= */
+async function renderRekapPresensiTim(container){
+ const p = currentPerson();
+ if(!p || !p.isLead) return;
+ const el = document.createElement('div');
+ el.className = 'card';
+ const anchor = container.querySelector('#detail-area');
+ if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(el, anchor);
+ else container.appendChild(el);
+
+ const w = prWIB(Date.now());
+ const bulanOpt = BULAN_NAMA.map((b, i) => `<option value="${i+1}" ${i+1 === w.m ? 'selected' : ''}>${b}</option>`).join('');
+ let tahunOpt = '';
+ for(let y = w.y - 1; y <= w.y + 1; y++) tahunOpt += `<option value="${y}" ${y === w.y ? 'selected' : ''}>${y}</option>`;
+
+ el.innerHTML = `
+ <div class="pr-tim-head">
+ <h3 class="pr-h3" style="margin:0;">🆔 Presensi Tim</h3>
+ <div class="pr-tim-kontrol">
+ <input type="date" id="pr-tim-tgl" value="${w.tanggal}">
+ <button type="button" class="btn-secondary pr-kecil" id="pr-tim-muat">🔄 Muat ulang</button>
+ </div>
+ </div>
+ <div class="pr-kecil-teks pr-muted" id="pr-tim-info" style="margin-bottom:12px;"></div>
+ <div id="pr-tim-harian"><div class="empty">Memuat…</div></div>
+ <h3 class="pr-h3" style="margin-top:22px;">📊 Rekap Bulan <span id="pr-tim-bulan"></span></h3>
+ <div id="pr-tim-rekap"></div>
+ <div class="pr-export">
+ <div class="pr-langkah-judul">📥 Export Daftar Hadir (Excel)</div>
+ <div class="pr-export-kontrol">
+ <select id="pr-exp-bulan">${bulanOpt}</select>
+ <select id="pr-exp-tahun">${tahunOpt}</select>
+ <label style="display:flex; align-items:center; gap:6px; font-size:13.5px;"><input type="checkbox" id="pr-exp-foto" checked> Sertakan lampiran foto selfie</label>
+ <button type="button" class="btn-primary" id="pr-exp-btn">Buat Daftar Hadir</button>
+ </div>
+ <div id="pr-exp-hasil" class="pr-kecil-teks" style="margin-top:10px;"></div>
+ </div>`;
+
+ const muat = async () => {
+ const tgl = el.querySelector('#pr-tim-tgl').value;
+ const harianEl = el.querySelector('#pr-tim-harian'), rekapEl = el.querySelector('#pr-tim-rekap');
+ harianEl.innerHTML = '<div class="empty">Memuat…</div>';
+ rekapEl.innerHTML = '';
+ let res;
+ try{ res = await prCallServer('apiPresensiTim', p.id, tgl); }
+ catch(e){ res = { ok:false, error:e.message }; }
+ if(!res || !res.ok){ harianEl.innerHTML = `<div class="empty">Gagal memuat presensi tim: ${prEsc(res && res.error)}</div>`; return; }
+ const lampau = res.tanggal < res.hariIni;
+ el.querySelector('#pr-tim-info').innerHTML = prEsc(res.info.label) + (res.info.libur ? ` · <span class="pr-badge info">${prEsc(res.info.libur)}</span>` : '');
+ el.querySelector('#pr-tim-bulan').textContent = res.bulanLabel;
+ const orang = h => `<div class="pr-orang">${typeof avatarHtml === 'function' ? avatarHtml(h) : ''}<div><b>${prEsc(h.nama)}</b><div class="pr-kecil-teks pr-muted" style="margin:0;">${prEsc(h.jabatan)}</div></div></div>`;
+
+ harianEl.innerHTML = `<div class="pr-scroll"><table class="pr-tabel">
+ <thead><tr><th>Anggota</th><th>Masuk</th><th>Pulang</th><th>Catatan</th></tr></thead>
+ <tbody>${res.harian.map(h => {
+ const r = h.record;
+ if(!r) return `<tr><td data-label="Anggota">${orang(h)}</td><td colspan="2" data-label="Status"><span class="pr-badge ${lampau ? 'bad' : 'info'}">${lampau ? 'Tidak absen' : 'Belum absen'}</span></td><td data-label="Catatan">—</td></tr>`;
+ if(r.status !== 'HADIR') return `<tr><td data-label="Anggota">${orang(h)}</td><td colspan="2" data-label="Status"><span class="pr-badge info">${prEsc(r.status)}</span></td><td data-label="Keterangan">${prEsc(r.keterangan)}</td></tr>`;
+ return `<tr><td data-label="Anggota">${orang(h)}</td><td data-label="Masuk">${prSelJam(r.masuk)}</td><td data-label="Pulang">${prSelJam(r.pulang)}</td><td data-label="Catatan">${prFlagsHtml(r, lampau)}</td></tr>`;
+ }).join('')}</tbody></table></div>`;
+
+ const angka = (n, kelas) => n > 0 ? `<span class="${kelas}">${n}</span>` : '0';
+ rekapEl.innerHTML = `<div class="pr-scroll"><table class="pr-tabel">
+ <thead><tr><th>Anggota</th><th>Hadir</th><th>Izin/Sakit/Cuti/DL</th><th>Tidak Absen</th><th>Terlambat</th><th>⚠️ Luar Lokasi</th><th>Tanpa Absen Pulang</th></tr></thead>
+ <tbody>${res.rekap.map(k => `<tr>
+ <td data-label="Anggota"><b>${prEsc(k.nama)}</b></td>
+ <td data-label="Hadir"><b>${k.hadir}</b> <span class="pr-kecil-teks pr-muted">/ ${k.hariKerja} hari kerja</span></td>
+ <td data-label="Izin/Sakit/Cuti/DL">${k.izin}</td>
+ <td data-label="Tidak Absen">${angka(k.tidakAbsen, 'pr-angka-bad')}</td>
+ <td data-label="Terlambat">${angka(k.terlambat, 'pr-angka-warn')}</td>
+ <td data-label="Di Luar Lokasi">${angka(k.luarLokasi, 'pr-angka-warn')}</td>
+ <td data-label="Tanpa Absen Pulang">${angka(k.tanpaPulang, 'pr-angka-warn')}</td>
+ </tr>`).join('')}</tbody></table></div>
+ <div class="pr-kecil-teks pr-muted">Hari kerja dihitung sampai kemarin (tanpa Sabtu, Minggu & tanggal di sheet HariLibur).</div>`;
+ };
+
+ el.querySelector('#pr-tim-tgl').addEventListener('change', muat);
+ el.querySelector('#pr-tim-muat').addEventListener('click', muat);
+
+ const expBtn = el.querySelector('#pr-exp-btn');
+ expBtn.addEventListener('click', async () => {
+ const y = +el.querySelector('#pr-exp-tahun').value, m = +el.querySelector('#pr-exp-bulan').value;
+ const foto = el.querySelector('#pr-exp-foto').checked;
+ const hasil = el.querySelector('#pr-exp-hasil');
+ expBtn.disabled = true;
+ hasil.innerHTML = '⏳ Sedang membuat file Daftar Hadir… Mohon tunggu' + (foto ? ' (bisa 1–4 menit karena menyertakan foto).' : '.');
+ try{
+ const r = await prCallServer('apiExportDaftarHadir', p.id, y, m, foto);
+ if(!r || !r.ok) throw new Error((r && r.error) || 'Gagal membuat file');
+ hasil.innerHTML = `✅ Berhasil: <b>${prEsc(r.namaFile)}</b><br>
+ <a href="${prEsc(r.url)}" target="_blank" rel="noopener">Buka di Google Sheets</a> &middot;
+ <a href="${prEsc(r.xlsxUrl)}" target="_blank" rel="noopener">Download Excel (.xlsx)</a><br>
+ <span class="pr-muted">${prEsc(r.pesan)}</span>`;
+ }catch(e){
+ hasil.innerHTML = `<span style="color:var(--libur,#D0463C)">Gagal: ${prEsc(e.message)}</span>`;
+ }
+ expBtn.disabled = false;
+ });
+
+ await muat();
+}
 </script>
 </body>
 </html>
