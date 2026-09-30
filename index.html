@@ -1946,5 +1946,383 @@ async function renderRekapPresensiTim(container){
  await muat();
 }
 </script>
+<!-- =====================================================================
+     MODUL TAMBAHAN v15: EXPORT LAPORAN (SEBULAN / PER MINGGU) & TANDA TANGAN
+     Cara pasang: tempel SELURUH blok ini tepat SEBELUM </body> di index.html
+     (di bawah modul presensi). Kode lain TIDAK perlu diubah.
+     ===================================================================== -->
+<style>
+ .ex-kontrol{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+ .ex-cek{display:flex; align-items:center; gap:6px; font-size:13.5px;}
+ .ex-info{font-size:12.5px; color:var(--ink-soft); margin-top:8px;}
+ .ex-hasil{margin-top:12px; font-size:13.5px; line-height:1.6;}
+ .ex-file{position:relative; display:inline-flex; align-items:center; cursor:pointer;}
+ .ex-file input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;}
+ .ttd-item{display:flex; gap:16px; align-items:center; flex-wrap:wrap; padding:14px 0; border-bottom:1px solid #EEF0F4;}
+ .ttd-item:last-child{border-bottom:none;}
+ .ttd-preview{width:220px; aspect-ratio:5/2; border:1px solid var(--line); border-radius:10px; overflow:hidden;
+   display:flex; align-items:center; justify-content:center;
+   background:#fff repeating-conic-gradient(#F1F3EE 0 25%, #fff 0 50%) 0 0/16px 16px;}
+ .ttd-preview img{max-width:100%; max-height:100%;}
+ .ttd-pad{display:block; width:100%; aspect-ratio:5/2; background:#fff; border:2px dashed var(--line);
+   border-radius:12px; touch-action:none; cursor:crosshair;}
+ @media (max-width:640px){ .ex-kontrol{flex-direction:column; align-items:stretch;} .ttd-preview{width:100%;} }
+</style>
+
+<script>
+(function(){
+
+ function esc(s){
+  return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ }
+
+ async function exPost(action, payload){
+  if(typeof WEB_APP_URL === 'undefined' || String(WEB_APP_URL).indexOf('https://') !== 0) throw new Error('WEB_APP_URL belum diisi.');
+  let res;
+  try{
+   res = await fetch(WEB_APP_URL, {
+    method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ action }, payload))
+   });
+  }catch(e){ throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet.'); }
+  const teks = await res.text();
+  let data;
+  try{ data = JSON.parse(teks); }
+  catch(e){ throw new Error('Respons server tidak valid. Pastikan Code.gs terbaru sudah di-deploy (versi baru).'); }
+  if(!data.ok) throw new Error(data.error || 'Gagal');
+  return data;
+ }
+
+ /* ---------- Periode: bulan, tahun, minggu ke-n (Senin s/d Minggu, sama seperti backend) ---------- */
+ function mingguDalamBulan(y, m){
+  const n = new Date(y, m, 0).getDate(), out = [];
+  let cur = [];
+  for(let d = 1; d <= n; d++){
+   cur.push(d);
+   if(new Date(y, m - 1, d).getDay() === 0 || d === n){ out.push(cur); cur = []; }
+  }
+  return out;
+ }
+ function pasangPeriode(root, y0, m0){
+  const sb = root.querySelector('[data-f="bulan"]'), st = root.querySelector('[data-f="tahun"]'), sm = root.querySelector('[data-f="minggu"]');
+  sb.innerHTML = BULAN_NAMA.map((b, i) => `<option value="${i+1}" ${i+1 === m0 ? 'selected' : ''}>${b}</option>`).join('');
+  const ty = new Date().getFullYear();
+  let t = '';
+  for(let y = ty - 1; y <= ty + 1; y++) t += `<option value="${y}" ${y === y0 ? 'selected' : ''}>${y}</option>`;
+  st.innerHTML = t;
+  const isi = () => {
+   const y = +st.value, m = +sb.value, w = mingguDalamBulan(y, m), bl = BULAN_NAMA[m-1];
+   sm.innerHTML = `<option value="0">Satu bulan penuh (${w.length} minggu)</option>` +
+    w.map((h, i) => `<option value="${i+1}">Minggu ke-${i+1} (${h[0]}${h.length > 1 ? '–' + h[h.length-1] : ''} ${bl})</option>`).join('');
+  };
+  sb.addEventListener('change', isi);
+  st.addEventListener('change', isi);
+  isi();
+  return () => ({ year:+st.value, month:+sb.value, minggu:+sm.value });
+ }
+ function hasilHtml(r){
+  return `✅ Berhasil: <b>${esc(r.namaFile)}</b><br>
+   <a href="${esc(r.url)}" target="_blank" rel="noopener">Buka di Google Sheets</a> &middot;
+   <a href="${esc(r.xlsxUrl)}" target="_blank" rel="noopener">Download Excel (.xlsx)</a>
+   ${r.pesan ? `<br><span style="color:var(--ink-soft)">${esc(r.pesan)}</span>` : ''}`;
+ }
+
+ /* ======================= KARTU: BUAT FILE LAPORAN KERJA ======================= */
+ function kartuLaporanKerja(personId){
+  const p = PEOPLE.find(x => x.id === personId) || { nama:'' };
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+   <h3 style="font-size:15.5px; margin:0 0 12px;">📥 Buat file laporan kerja (Excel) · ${esc(p.nama)}</h3>
+   <div class="ex-kontrol">
+    <select data-f="bulan"></select>
+    <select data-f="tahun"></select>
+    <select data-f="minggu"></select>
+    <label class="ex-cek"><input type="checkbox" data-f="ttd" checked> Bubuhkan tanda tangan</label>
+    <button type="button" class="btn-primary" data-f="btn">Buat Laporan</button>
+   </div>
+   <div class="ex-info">Satu bulan penuh menghasilkan 1 sheet per minggu; pilihan minggu hanya membuat minggu itu. Huruf Calibri 22, foto 14,72 × 9,18 cm.</div>
+   <div class="ex-hasil" data-f="hasil"></div>`;
+  const ambil = pasangPeriode(card, state.historyYear, state.historyMonth);
+  const btn = card.querySelector('[data-f="btn"]'), hasil = card.querySelector('[data-f="hasil"]');
+  btn.addEventListener('click', async () => {
+   const saya = currentPerson();
+   if(!saya) return;
+   const per = ambil();
+   btn.disabled = true;
+   hasil.innerHTML = '⏳ Membuat file… ' + (per.minggu ? 'biasanya kurang dari 1 menit.' : 'bisa 1–5 menit karena semua foto sebulan disisipkan.');
+   try{
+    const r = await exPost('exportlaporan', {
+     requesterId: saya.id, personId, year: per.year, month: per.month, minggu: per.minggu,
+     pakaiTtd: card.querySelector('[data-f="ttd"]').checked
+    });
+    hasil.innerHTML = hasilHtml(r);
+   }catch(e){
+    hasil.innerHTML = `<span style="color:var(--libur)">Gagal: ${esc(e.message)}</span>`;
+   }
+   btn.disabled = false;
+  });
+  return card;
+ }
+
+ /* ======================= DAFTAR HADIR: tambah pilihan minggu & tanda tangan ======================= */
+ function perbaruiExportPresensi(container){
+  const box = container.querySelector('.pr-export');
+  const p = currentPerson();
+  if(!box || !p) return;
+  const now = new Date();
+  box.innerHTML = `
+   <div class="pr-langkah-judul">📥 Export Daftar Hadir (Excel)</div>
+   <div class="ex-kontrol">
+    <select data-f="bulan"></select>
+    <select data-f="tahun"></select>
+    <select data-f="minggu"></select>
+    <label class="ex-cek"><input type="checkbox" data-f="foto" checked> Lampiran foto selfie</label>
+    <label class="ex-cek"><input type="checkbox" data-f="ttd" checked> Bubuhkan tanda tangan</label>
+    <button type="button" class="btn-primary" data-f="btn">Buat Daftar Hadir</button>
+   </div>
+   <div class="ex-hasil" data-f="hasil"></div>`;
+  const ambil = pasangPeriode(box, now.getFullYear(), now.getMonth() + 1);
+  const btn = box.querySelector('[data-f="btn"]'), hasil = box.querySelector('[data-f="hasil"]');
+  btn.addEventListener('click', async () => {
+   const per = ambil();
+   const foto = box.querySelector('[data-f="foto"]').checked;
+   const ttd = box.querySelector('[data-f="ttd"]').checked;
+   btn.disabled = true;
+   hasil.innerHTML = '⏳ Membuat file Daftar Hadir…' + (foto ? ' bisa 1–4 menit karena menyertakan foto.' : '');
+   try{
+    const r = await prCallServer('apiExportDaftarHadir', p.id, per.year, per.month, foto, per.minggu, ttd);
+    if(!r || !r.ok) throw new Error((r && r.error) || 'Gagal membuat file');
+    hasil.innerHTML = hasilHtml(r);
+   }catch(e){
+    hasil.innerHTML = `<span style="color:var(--libur)">Gagal: ${esc(e.message)}</span>`;
+   }
+   btn.disabled = false;
+  });
+ }
+
+ /* ======================= TANDA TANGAN: pad gambar & unggah ======================= */
+ function muatGambar(src){
+  return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('File bukan gambar yang valid.')); i.src = src; });
+ }
+ // Potong area kosong lalu pusatkan ke kanvas 600x240 PNG transparan (rasio 5:2)
+ function rapikanTtd(cv){
+  const w = cv.width, h = cv.height;
+  const d = cv.getContext('2d').getImageData(0, 0, w, h).data;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
+   if(d[(y * w + x) * 4 + 3] > 20){ if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+  }
+  if(x1 < 0) return null;
+  const sw = x1 - x0 + 1, sh = y1 - y0 + 1, W = 600, H = 240, pad = 12;
+  const s = Math.min((W - 2 * pad) / sw, (H - 2 * pad) / sh);
+  const out = document.createElement('canvas');
+  out.width = W; out.height = H;
+  const o = out.getContext('2d');
+  o.imageSmoothingQuality = 'high';
+  o.drawImage(cv, x0, y0, sw, sh, (W - sw * s) / 2, (H - sh * s) / 2, sw * s, sh * s);
+  return out.toDataURL('image/png');
+ }
+ // Foto/scan tanda tangan di kertas putih -> latar putih dibuat transparan
+ async function ttdDariFile(file){
+  const url = URL.createObjectURL(file);
+  try{
+   const img = await muatGambar(url);
+   const sk = Math.min(1, 1200 / Math.max(img.naturalWidth, img.naturalHeight));
+   const cv = document.createElement('canvas');
+   cv.width = Math.round(img.naturalWidth * sk); cv.height = Math.round(img.naturalHeight * sk);
+   const c = cv.getContext('2d');
+   c.drawImage(img, 0, 0, cv.width, cv.height);
+   const id = c.getImageData(0, 0, cv.width, cv.height), d = id.data;
+   for(let i = 0; i < d.length; i += 4){
+    const lum = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+    if(lum >= 215) d[i+3] = 0;
+    else if(lum > 150) d[i+3] = Math.round(d[i+3] * (215 - lum) / 65);
+   }
+   c.putImageData(id, 0, 0);
+   return rapikanTtd(cv);
+  } finally { URL.revokeObjectURL(url); }
+ }
+ function bukaPadTtd(judul){
+  return new Promise(resolve => {
+   const ov = document.createElement('div');
+   ov.className = 'pr-overlay';
+   ov.innerHTML = `<div class="pr-modal" style="width:620px;">
+     <h3 class="pr-h3">✍️ ${esc(judul)}</h3>
+     <p class="pr-kecil-teks pr-muted" style="margin:0 0 10px;">Tanda tangani di dalam kotak memakai jari (HP/tablet) atau mouse.</p>
+     <canvas class="ttd-pad"></canvas>
+     <div class="pr-modal-aksi">
+      <button type="button" class="btn-secondary" data-a="ulang">Ulangi</button>
+      <button type="button" class="btn-secondary" data-a="batal">Batal</button>
+      <button type="button" class="btn-primary" data-a="simpan">Simpan</button>
+     </div></div>`;
+   document.body.appendChild(ov);
+   const cv = ov.querySelector('canvas');
+   const dpr = window.devicePixelRatio || 1;
+   const rect = cv.getBoundingClientRect();
+   cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr);
+   const ctx = cv.getContext('2d');
+   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+   ctx.strokeStyle = ctx.fillStyle = '#0B1F5C'; // tinta biru tua
+   ctx.lineWidth = 2.8 * dpr;
+   let menggambar = false, ada = false, akhir = null;
+   const titik = e => { const r = cv.getBoundingClientRect(); return { x:(e.clientX - r.left) * dpr, y:(e.clientY - r.top) * dpr }; };
+   cv.addEventListener('pointerdown', e => {
+    e.preventDefault(); cv.setPointerCapture(e.pointerId);
+    menggambar = true; ada = true; akhir = titik(e);
+    ctx.beginPath(); ctx.arc(akhir.x, akhir.y, ctx.lineWidth / 2, 0, Math.PI * 2); ctx.fill();
+   });
+   cv.addEventListener('pointermove', e => {
+    if(!menggambar) return;
+    e.preventDefault();
+    const pts = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    pts.forEach(ev => {
+     const t = titik(ev);
+     ctx.beginPath(); ctx.moveTo(akhir.x, akhir.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+     akhir = t;
+    });
+   });
+   const berhenti = () => { menggambar = false; };
+   cv.addEventListener('pointerup', berhenti);
+   cv.addEventListener('pointercancel', berhenti);
+   const tutup = v => { ov.remove(); resolve(v); };
+   ov.addEventListener('click', e => {
+    const b = e.target.closest('[data-a]');
+    if(!b) return;
+    if(b.dataset.a === 'ulang'){ ctx.clearRect(0, 0, cv.width, cv.height); ada = false; }
+    if(b.dataset.a === 'batal') tutup(null);
+    if(b.dataset.a === 'simpan'){
+     if(!ada){ showToast('Kotak tanda tangan masih kosong'); return; }
+     tutup(rapikanTtd(cv));
+    }
+   });
+  });
+ }
+
+ /* ======================= KARTU: TANDA TANGAN DIGITAL (Pengaturan) ======================= */
+ function kartuTandaTangan(container){
+  const p = currentPerson();
+  if(!p) return;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+   <h3 style="font-size:15px; margin-bottom:6px;">✍️ Tanda Tangan Digital</h3>
+   <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 14px;">
+    Dibubuhkan otomatis di kolom "Dibuat Oleh" / "Diketahui Oleh" pada file laporan kerja dan daftar hadir. File disimpan privat di Google Drive.
+    ${p.isLead ? 'Sebagai Team Leader, Anda juga bisa mengatur tanda tangan pejabat penanda tangan. Gunakan hanya dengan izin yang bersangkutan.' : ''}
+   </p>
+   <div data-f="isi"></div>`;
+  container.appendChild(card);
+  const isi = card.querySelector('[data-f="isi"]');
+  let pin = '';
+
+  const formPin = (pesanError) => {
+   isi.innerHTML = `
+    <div class="ex-kontrol">
+     <input type="password" inputmode="numeric" data-f="pin" placeholder="PIN Anda" style="width:160px;">
+     <button type="button" class="btn-primary" data-f="buka">Tampilkan tanda tangan</button>
+    </div>
+    <div class="ex-info" style="${pesanError ? 'color:var(--libur)' : ''}">${pesanError ? esc(pesanError) : 'Masukkan PIN untuk melihat dan mengubah tanda tangan.'}</div>`;
+   const inp = isi.querySelector('[data-f="pin"]');
+   const buka = () => { const v = inp.value.trim(); if(!v){ showToast('Masukkan PIN'); return; } pin = v; muat(); };
+   isi.querySelector('[data-f="buka"]').addEventListener('click', buka);
+   inp.addEventListener('keydown', e => { if(e.key === 'Enter') buka(); });
+  };
+
+  const muat = async () => {
+   isi.innerHTML = '<div class="empty">Memuat…</div>';
+   let r;
+   try{ r = await exPost('ttdlist', { personId: p.id, pin }); }
+   catch(e){ pin = ''; formPin(e.message); return; }
+   isi.innerHTML = '';
+   r.data.forEach(t => {
+    const it = document.createElement('div');
+    it.className = 'ttd-item';
+    it.innerHTML = `
+     <div class="ttd-preview">${t.dataUrl ? `<img src="${t.dataUrl}" alt="Tanda tangan ${esc(t.nama)}">` : '<span class="pr-kecil-teks pr-muted">Belum ada</span>'}</div>
+     <div style="flex:1; min-width:220px;">
+      <b>${esc(t.nama)}</b>${t.milikSendiri ? ' <span class="pr-badge info">Anda</span>' : ''}
+      <div class="pr-kecil-teks pr-muted">${esc(t.keterangan || '')}${t.info ? '<br>' + esc(t.info) : ''}</div>
+      <div class="ex-kontrol" style="margin-top:10px;">
+       <button type="button" class="btn-secondary pr-kecil" data-a="pad">✍️ Tanda tangan langsung</button>
+       <label class="btn-secondary pr-kecil ex-file">📁 Unggah gambar<input type="file" accept="image/*" data-a="file"></label>
+       ${t.dataUrl ? '<button type="button" class="btn-secondary pr-kecil" data-a="hapus" style="color:var(--libur)">Hapus</button>' : ''}
+      </div>
+     </div>`;
+    const simpan = async (dataUrl) => {
+     if(!dataUrl){ showToast('Tanda tangan tidak terbaca, coba lagi'); return; }
+     showToast('Menyimpan tanda tangan…');
+     try{
+      await exPost('setttd', { personId: p.id, pin, kunci: t.kunci, ttdBase64: dataUrl });
+      showToast('Tanda tangan tersimpan');
+      muat();
+     }catch(e){ showToast('Gagal: ' + e.message); }
+    };
+    it.querySelector('[data-a="pad"]').addEventListener('click', async () => {
+     const d = await bukaPadTtd('Tanda tangan ' + t.nama);
+     if(d) simpan(d);
+    });
+    it.querySelector('[data-a="file"]').addEventListener('change', async e => {
+     const f = e.target.files && e.target.files[0];
+     e.target.value = '';
+     if(!f) return;
+     try{ simpan(await ttdDariFile(f)); }catch(err){ showToast('Gagal: ' + err.message); }
+    });
+    const hapus = it.querySelector('[data-a="hapus"]');
+    if(hapus) hapus.addEventListener('click', async () => {
+     const ok = await prKonfirmasi('Hapus tanda tangan <b>' + esc(t.nama) + '</b>?', 'Ya, hapus');
+     if(!ok) return;
+     try{
+      await exPost('hapusttd', { personId: p.id, pin, kunci: t.kunci });
+      showToast('Tanda tangan dihapus');
+      muat();
+     }catch(e){ showToast('Gagal: ' + e.message); }
+    });
+    isi.appendChild(it);
+   });
+  };
+  formPin('');
+ }
+
+ /* ======================= SAMBUNGKAN KE HALAMAN YANG SUDAH ADA ======================= */
+ // Riwayat Laporan Saya & detail anggota di Laporan Tim -> tambah kartu "Buat file laporan kerja"
+ const riwayatAsli = renderRiwayat;
+ renderRiwayat = function(container, personId){
+  const janji = riwayatAsli.apply(this, arguments);
+  try{
+   const subs = container.querySelectorAll('.sticky-subheader');
+   const kartu = kartuLaporanKerja(personId);
+   if(subs.length) subs[subs.length - 1].after(kartu); else container.appendChild(kartu);
+  }catch(e){ console.error(e); }
+  return janji;
+ };
+
+ // Pengaturan -> tambah kartu Tanda Tangan Digital
+ const pengaturanAsli = renderPengaturan;
+ renderPengaturan = async function(container){
+  await pengaturanAsli.apply(this, arguments);
+  if(container.isConnected) kartuTandaTangan(container);
+ };
+
+ // Panel Presensi Tim -> export Daftar Hadir dengan pilihan minggu & tanda tangan
+ const rekapPresensiAsli = renderRekapPresensiTim;
+ renderRekapPresensiTim = function(container){
+  const janji = rekapPresensiAsli.apply(this, arguments);
+  try{ perbaruiExportPresensi(container); }catch(e){ console.error(e); }
+  return janji;
+ };
+
+ // Laporan Tim -> perbarui teks petunjuk
+ const timAsli = renderTim;
+ renderTim = function(container){
+  const janji = timAsli.apply(this, arguments);
+  try{
+   const d = container.querySelector('.view-title p');
+   if(d) d.innerHTML = 'Pantau laporan seluruh anggota. Klik <strong>Lihat / Edit</strong> pada anggota untuk membuat file Excel laporannya, sebulan penuh atau per minggu.';
+  }catch(e){ console.error(e); }
+  return janji;
+ };
+})();
+</script>  
 </body>
 </html>
