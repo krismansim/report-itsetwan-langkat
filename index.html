@@ -2027,43 +2027,43 @@ async function renderRekapPresensiTim(container){
    ${r.pesan ? `<br><span style="color:var(--ink-soft)">${esc(r.pesan)}</span>` : ''}`;
  }
 
- /* ======================= KARTU: BUAT FILE LAPORAN KERJA ======================= */
- function kartuLaporanKerja(personId){
-  const p = PEOPLE.find(x => x.id === personId) || { nama:'' };
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = `
-   <h3 style="font-size:15.5px; margin:0 0 12px;">📥 Buat file laporan kerja (Excel) · ${esc(p.nama)}</h3>
-   <div class="ex-kontrol">
-    <select data-f="bulan"></select>
-    <select data-f="tahun"></select>
-    <select data-f="minggu"></select>
-    <label class="ex-cek"><input type="checkbox" data-f="ttd" checked> Bubuhkan tanda tangan</label>
-    <button type="button" class="btn-primary" data-f="btn">Buat Laporan</button>
-   </div>
-   <div class="ex-info">Satu bulan penuh menghasilkan 1 sheet per minggu; pilihan minggu hanya membuat minggu itu. Huruf Calibri 22, foto 14,72 × 9,18 cm.</div>
-   <div class="ex-hasil" data-f="hasil"></div>`;
-  const ambil = pasangPeriode(card, state.historyYear, state.historyMonth);
-  const btn = card.querySelector('[data-f="btn"]'), hasil = card.querySelector('[data-f="hasil"]');
-  btn.addEventListener('click', async () => {
-   const saya = currentPerson();
-   if(!saya) return;
-   const per = ambil();
-   btn.disabled = true;
-   hasil.innerHTML = '⏳ Membuat file… ' + (per.minggu ? 'biasanya kurang dari 1 menit.' : 'bisa 1–5 menit karena semua foto sebulan disisipkan.');
-   try{
-    const r = await exPost('exportlaporan', {
-     requesterId: saya.id, personId, year: per.year, month: per.month, minggu: per.minggu,
-     pakaiTtd: card.querySelector('[data-f="ttd"]').checked
-    });
-    hasil.innerHTML = hasilHtml(r);
-   }catch(e){
-    hasil.innerHTML = `<span style="color:var(--libur)">Gagal: ${esc(e.message)}</span>`;
-   }
-   btn.disabled = false;
-  });
-  return card;
- }
+ // /* ======================= KARTU: BUAT FILE LAPORAN KERJA ======================= */
+ // function kartuLaporanKerja(personId){
+ //  const p = PEOPLE.find(x => x.id === personId) || { nama:'' };
+ //  const card = document.createElement('div');
+ //  card.className = 'card';
+ //  card.innerHTML = `
+ //   <h3 style="font-size:15.5px; margin:0 0 12px;">📥 Buat file laporan kerja (Excel) · ${esc(p.nama)}</h3>
+ //   <div class="ex-kontrol">
+ //    <select data-f="bulan"></select>
+ //    <select data-f="tahun"></select>
+ //    <select data-f="minggu"></select>
+ //    <label class="ex-cek"><input type="checkbox" data-f="ttd" checked> Bubuhkan tanda tangan</label>
+ //    <button type="button" class="btn-primary" data-f="btn">Buat Laporan</button>
+ //   </div>
+ //   <div class="ex-info">Satu bulan penuh menghasilkan 1 sheet per minggu; pilihan minggu hanya membuat minggu itu. Huruf Calibri 22, foto 14,72 × 9,18 cm.</div>
+ //   <div class="ex-hasil" data-f="hasil"></div>`;
+ //  const ambil = pasangPeriode(card, state.historyYear, state.historyMonth);
+ //  const btn = card.querySelector('[data-f="btn"]'), hasil = card.querySelector('[data-f="hasil"]');
+ //  btn.addEventListener('click', async () => {
+ //   const saya = currentPerson();
+ //   if(!saya) return;
+ //   const per = ambil();
+ //   btn.disabled = true;
+ //   hasil.innerHTML = '⏳ Membuat file… ' + (per.minggu ? 'biasanya kurang dari 1 menit.' : 'bisa 1–5 menit karena semua foto sebulan disisipkan.');
+ //   try{
+ //    const r = await exPost('exportlaporan', {
+ //     requesterId: saya.id, personId, year: per.year, month: per.month, minggu: per.minggu,
+ //     pakaiTtd: card.querySelector('[data-f="ttd"]').checked
+ //    });
+ //    hasil.innerHTML = hasilHtml(r);
+ //   }catch(e){
+ //    hasil.innerHTML = `<span style="color:var(--libur)">Gagal: ${esc(e.message)}</span>`;
+ //   }
+ //   btn.disabled = false;
+ //  });
+ //  return card;
+ // }
 
  /* ======================= DAFTAR HADIR: tambah pilihan minggu & tanda tangan ======================= */
  function perbaruiExportPresensi(container){
