@@ -948,7 +948,7 @@ async function renderTim(container){
       <div class="view-title">
         <div class="badge-ico">&#128202;</div>
         <div><h2>Rekap Tim</h2>
-        <p>Pantau laporan seluruh anggota. Anggota tanpa hak akses Absensi/Presensi tetap tampil pada rekap pekerjaan dan grafik perkembangan tugasnya, tetapi tidak dimasukkan ke Rekap/Export Daftar Hadir.</p></div>
+        <p>Pantau laporan seluruh anggota. Anggota tanpa hak akses Absensi/Presensi tetap tampil pada rekap pekerjaan, tetapi tidak dimasukkan ke Rekap/Export Daftar Hadir.</p></div>
       </div>
       <div class="month-nav">
         <select id="sel-bulan"></select>
@@ -959,17 +959,6 @@ async function renderTim(container){
     </div>
     <div id="versi-info"></div>
     <div class="card" id="team-summary"><div class="empty">Memuat...</div></div>
-    <div class="card rt-grafik-wrap" id="team-progress-chart">
-      <h3 style="font-size:16px;margin:0 0 4px;">&#128200; Perkembangan Tugas / Laporan Kerja</h3>
-      <p style="margin:0;color:var(--ink-soft);font-size:13px;">Grafik berdasarkan hari laporan kerja yang sudah diisi. Anggota tanpa akses Absensi/Presensi tetap dapat dipantau berdasarkan tugas/laporannya.</p>
-      <div class="rt-grafik-kontrol">
-        <label style="font-size:13px;font-weight:600;">Anggota:
-          <select id="rt-grafik-person" style="margin-left:6px;min-width:230px;"></select>
-        </label>
-        <span id="rt-grafik-status" style="font-size:12px;color:var(--ink-soft);"></span>
-      </div>
-      <div class="rt-grafik" id="rt-grafik-box"><div class="empty">Memuat grafik...</div></div>
-    </div>
     <div id="detail-area"></div>
   `;
   container.appendChild(wrap);
@@ -1001,55 +990,6 @@ async function renderTim(container){
     if(y===state.historyYear) o.selected=true; selTahun.appendChild(o);
   }
 
-  const grafikPerson = wrap.querySelector('#rt-grafik-person');
-  PEOPLE.forEach(p=>{
-    const o=document.createElement('option'); o.value=p.id; o.textContent=p.nama;
-    grafikPerson.appendChild(o);
-  });
-
-  function escapeHtml(str){
-    const d=document.createElement('div'); d.textContent=String(str??''); return d.innerHTML;
-  }
-  function renderTaskLineChart(entries, year, month, person){
-    const days = new Date(year, month, 0).getDate();
-    const points=[];
-    let kumulatif=0;
-    for(let d=1;d<=days;d++){
-      const key=`${year}-${pad2(month)}-${pad2(d)}`;
-      const ada=!!entries[key];
-      if(ada) kumulatif++;
-      points.push({d,ada,kumulatif,pct:days?Math.round(kumulatif/days*100):0});
-    }
-    const W=980,H=250,L=54,R=20,T=22,B=42, PW=W-L-R, PH=H-T-B;
-    const maxY=100;
-    const px=d=>L+((d-1)/Math.max(1,days-1))*PW;
-    const py=v=T+(1-v/maxY)*PH;
-    const path=points.map((q,i)=>`${i?'L':'M'} ${px(q.d).toFixed(1)} ${py(q.pct).toFixed(1)}`).join(' ');
-    const dots=points.filter(q=>q.ada).map(q=>`<circle cx="${px(q.d).toFixed(1)}" cy="${py(q.pct).toFixed(1)}" r="4" fill="currentColor"><title>${q.d} ${BULAN_NAMA[month-1]}: ${q.pct}% kumulatif</title></circle>`).join('');
-    const grid=[0,25,50,75,100].map(v=>{
-      const y=py(v); return `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#E6E9E3"/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#69736D">${v}%</text>`;
-    }).join('');
-    const labels=[];
-    for(let d=1;d<=days;d+=Math.max(1,Math.ceil(days/8))){ labels.push(`<text x="${px(d)}" y="${H-14}" text-anchor="middle" font-size="11" fill="#69736D">${d}</text>`); }
-    labels.push(`<text x="${W/2}" y="${H-2}" text-anchor="middle" font-size="11" fill="#69736D">Tanggal</text>`);
-    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik perkembangan laporan kerja ${escapeHtml(person.nama)}">${grid}<line x1="${L}" y1="${T}" x2="${L}" y2="${H-B}" stroke="#9AA39D"/><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#9AA39D"/><path d="${path}" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}</svg>`;
-  }
-
-  async function loadGrafik(){
-    const box=wrap.querySelector('#rt-grafik-box'), status=wrap.querySelector('#rt-grafik-status');
-    const pid=grafikPerson.value; const person=PEOPLE.find(x=>x.id===pid);
-    box.innerHTML='<div class="empty">Memuat grafik...</div>';
-    if(!person) return;
-    try{
-      const entries=await getEntriesForMonth(pid,state.historyYear,state.historyMonth);
-      const filled=Object.keys(entries).length;
-      const aksesPresensi=!!(person.isLead || (person.access && person.access.presensi));
-      const aksesPdf=!!(person.isLead || (person.access && person.access.laporanPdf));
-      status.innerHTML=`${aksesPresensi?'<span class="rt-status presensi">Absensi/Presensi: aktif</span>':'<span class="rt-status no-presensi">Absensi/Presensi: tidak diberikan</span>'} <span class="rt-status ${aksesPdf?'presensi':'no-presensi'}">Arsip PDF: ${aksesPdf?'diizinkan':'tidak diberikan'}</span> &nbsp; ${filled} hari laporan terisi`;
-      box.innerHTML=renderTaskLineChart(entries,state.historyYear,state.historyMonth,person);
-    }catch(e){ box.innerHTML=`<div class="empty">Gagal memuat grafik: ${escapeHtml(e.message)}</div>`; }
-  }
-
   async function loadSummary(){
     const summaryEl=wrap.querySelector('#team-summary'); summaryEl.innerHTML='<div class="empty">Memuat...</div>';
     const year=state.historyYear, month=state.historyMonth, daysInMonth=new Date(year,month,0).getDate();
@@ -1059,16 +999,15 @@ async function renderTim(container){
       const presensiAktif=!!(p.isLead || (p.access && p.access.presensi));
       const pdfAktif=!!(p.isLead || (p.access && p.access.laporanPdf));
       const row=document.createElement('div'); row.className='team-card';
-      row.innerHTML=`<div style="display:flex;align-items:center;gap:12px;">${avatarHtml(p)}<div><strong>${escapeHtml(p.nama)}</strong><div class="meta">${escapeHtml(p.jabatan)} - ${filled} dari ${daysInMonth} hari terisi</div><div><span class="rt-status ${presensiAktif?'presensi':'no-presensi'}">${presensiAktif?'Presensi aktif':'Tanpa akses Presensi'}</span> <span class="rt-status ${pdfAktif?'presensi':'no-presensi'}">${pdfAktif?'Arsip PDF':'Tanpa Arsip PDF'}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div></div><div style="display:flex;gap:8px;"><button class="btn-secondary" data-grafik="${escapeHtml(p.id)}">Grafik Tugas</button><button class="btn-secondary" data-detail="${escapeHtml(p.id)}">Lihat / Edit</button></div>`;
+      row.innerHTML=`<div style="display:flex;align-items:center;gap:12px;">${avatarHtml(p)}<div><strong>${escapeHtml(p.nama)}</strong><div class="meta">${escapeHtml(p.jabatan)} - ${filled} dari ${daysInMonth} hari terisi</div><div><span class="rt-status ${presensiAktif?'presensi':'no-presensi'}">${presensiAktif?'Presensi aktif':'Tanpa akses Presensi'}</span> <span class="rt-status ${pdfAktif?'presensi':'no-presensi'}">${pdfAktif?'Arsip PDF':'Tanpa Arsip PDF'}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div></div><div style="display:flex;gap:8px;"><button class="btn-secondary" data-detail="${escapeHtml(p.id)}">Lihat / Edit</button></div>`;
       summaryEl.appendChild(row);
     }
     summaryEl.querySelectorAll('[data-detail]').forEach(btn=>btn.addEventListener('click',async()=>{const detailArea=wrap.querySelector('#detail-area'); const p=PEOPLE.find(x=>x.id===btn.dataset.detail); detailArea.innerHTML=`<h3 style="margin-bottom:10px;">Detail - ${escapeHtml(p?p.nama:'Anggota')}</h3>`; await renderRiwayat(detailArea,btn.dataset.detail,true);}));
-    summaryEl.querySelectorAll('[data-grafik]').forEach(btn=>btn.addEventListener('click',()=>{grafikPerson.value=btn.dataset.grafik; loadGrafik(); wrap.querySelector('#team-progress-chart').scrollIntoView({behavior:'smooth',block:'start'});}));
   }
 
-  async function refresh(){ state.historyMonth=+selBulan.value; state.historyYear=+selTahun.value; await loadSummary(); await loadGrafik(); }
-  selBulan.addEventListener('change',refresh); selTahun.addEventListener('change',refresh); grafikPerson.addEventListener('change',loadGrafik);
-  await loadSummary(); await loadGrafik();
+  async function refresh(){ state.historyMonth=+selBulan.value; state.historyYear=+selTahun.value; await loadSummary(); }
+  selBulan.addEventListener('change',refresh); selTahun.addEventListener('change',refresh);
+  await loadSummary();
   renderRekapPresensiTim(wrap);
 }
 /* ---------------- MAIN RENDER ---------------- */
@@ -1162,284 +1101,87 @@ async function renderBeranda(container){
   const now = new Date();
   const jamSekarang = now.getHours();
   const sapaan = jamSekarang < 11 ? 'Selamat pagi' : jamSekarang < 15 ? 'Selamat siang' : jamSekarang < 18 ? 'Selamat sore' : 'Selamat malam';
+  const aksesIsi = !!(p.isLead || (p.access && p.access.isiLaporan));
+  const aksesPresensi = !!(p.isLead || (p.access && p.access.presensi));
+  const aksesRiwayat = !!(p.isLead || (p.access && p.access.riwayat));
+  const aksesPdf = !!(p.isLead || (p.access && p.access.laporanPdf));
 
-  wrap.innerHTML = `
-    <div class="cta-banner">
-      <div>
-        <h3>${sapaan}, ${p.nama.split(',')[0]} &#128075;</h3>
-        <p>Jangan lupa isi laporan kegiatan hari ini sebelum jam kerja berakhir.</p>
-      </div>
-      <button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">&#128221; Isi Laporan Sekarang</button>
-    </div>
-    <div class="stat-grid" id="beranda-stats">
-      <div class="card"><div class="empty">Memuat ringkasan...</div></div>
-    </div>
-    ${p.isLead ? '<div class="view-title" style="margin-bottom:12px;"><h2 style="font-size:17px;">Progres Tim Bulan Ini</h2></div><div class="card" id="beranda-team"><div class="empty">Memuat...</div></div>' : ''}
-  `;
-  container.appendChild(wrap);
-  wrap.querySelector('#btn-cta-isi').addEventListener('click', ()=>{ state.tab='isi'; render(); });
+  let pesan = 'Gunakan menu yang tersedia sesuai hak akses dan tugas Anda.';
+  if(aksesIsi && aksesPresensi){
+    pesan = 'Silakan kelola laporan kerja dan presensi melalui menu yang tersedia.';
+  }else if(aksesIsi){
+    pesan = 'Silakan gunakan menu Isi Laporan untuk mencatat pekerjaan dan kegiatan Anda.';
+  }else if(aksesPresensi){
+    pesan = 'Silakan gunakan menu Absensi / Presensi untuk mencatat dan memantau kehadiran Anda.';
+  }else if(aksesPdf){
+    pesan = 'Arsip laporan yang diberikan kepada Anda dapat diakses melalui menu Arsip Laporan PDF.';
+  }else if(aksesRiwayat){
+    pesan = 'Gunakan menu Riwayat Laporan Saya untuk melihat data yang tersedia bagi Anda.';
+  }
 
   const year = now.getFullYear(), month = now.getMonth()+1;
   const daysInMonth = new Date(year, month, 0).getDate();
   const daysSoFar = now.getDate();
-  const entries = await getEntriesForMonth(p.id, year, month);
-  const filled = Object.keys(entries).length;
-  const todayStr = `${year}-${pad2(month)}-${pad2(now.getDate())}`;
-  const isiHariIni = !!entries[todayStr];
+  const statCards = [];
+  if(aksesIsi){
+    statCards.push('<div class="stat-card"><div class="num" id="stat-filled">-</div><div class="label">Hari laporan terisi bulan ini</div></div>');
+  }
+  if(aksesPresensi){
+    statCards.push('<div class="stat-card"><div class="num">&#128197;</div><div class="label">Presensi tersedia</div></div>');
+  }
+  if(aksesPdf){
+    statCards.push('<div class="stat-card"><div class="num">&#128196;</div><div class="label">Arsip PDF tersedia</div></div>');
+  }
+  statCards.push(`<div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>`);
 
-  const statsEl = wrap.querySelector('#beranda-stats');
-  statsEl.innerHTML = `
-    <div class="stat-card"><div class="num">${filled} / ${daysSoFar}</div><div class="label">Hari terisi bulan ini</div></div>
-    <div class="stat-card"><div class="num">${isiHariIni ? '&#9989;' : '-'}</div><div class="label">Laporan hari ini</div></div>
-    <div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>
+  wrap.innerHTML = `
+    <div class="cta-banner">
+      <div>
+        <h3>${sapaan}, ${escapeHtml(p.nama.split(',')[0])} &#128075;</h3>
+        <p>${pesan}</p>
+      </div>
+      ${aksesIsi ? '<button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">&#128221; Isi Laporan Sekarang</button>' : ''}
+    </div>
+    <div class="stat-grid" id="beranda-stats">${statCards.join('')}</div>
+    ${p.isLead ? '<div class="view-title" style="margin-bottom:12px;"><h2 style="font-size:17px;">Progres Tim Bulan Ini</h2></div><div class="card" id="beranda-team"><div class="empty">Memuat...</div></div>' : ''}
   `;
+  container.appendChild(wrap);
+
+  if(aksesIsi){
+    wrap.querySelector('#btn-cta-isi').addEventListener('click', ()=>{ state.tab='isi'; render(); });
+    try{
+      const entries = await getEntriesForMonth(p.id, year, month);
+      const filled = Object.keys(entries).length;
+      const statFilled = wrap.querySelector('#stat-filled');
+      if(statFilled) statFilled.textContent = `${filled} / ${daysSoFar}`;
+    }catch(e){
+      const statFilled = wrap.querySelector('#stat-filled');
+      if(statFilled) statFilled.textContent = '-';
+    }
+  }
 
   if(p.isLead){
     const teamEl = wrap.querySelector('#beranda-team');
     teamEl.innerHTML = '';
     for(const person of PEOPLE){
+      const personAksesIsi = !!(person.isLead || (person.access && person.access.isiLaporan));
+      if(!personAksesIsi){
+        const row = document.createElement('div');
+        row.className = 'team-card';
+        row.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">${avatarHtml(person)}<div><strong>${escapeHtml(person.nama)}</strong><div class="meta">Tidak memiliki akses Isi Laporan</div></div></div><div><span class="rt-status no-presensi">Akses laporan tidak diberikan</span></div>`;
+        teamEl.appendChild(row);
+        continue;
+      }
       const e = await getEntriesForMonth(person.id, year, month);
       const f = Object.keys(e).length;
       const pct = Math.round((f/daysSoFar)*100);
       const row = document.createElement('div');
       row.className = 'team-card';
-      row.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px;">
-          ${avatarHtml(person)}
-          <div><strong>${person.nama}</strong><div class="meta">${f} dari ${daysSoFar} hari berjalan terisi</div></div>
-        </div>
-        <div class="progress-bar" style="margin-top:0;"><div class="progress-fill" style="width:${pct}%"></div></div>
-      `;
+      row.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">${avatarHtml(person)}<div><strong>${escapeHtml(person.nama)}</strong><div class="meta">${f} dari ${daysSoFar} hari berjalan terisi</div></div></div><div style="min-width:160px;"><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,pct)}%"></div></div><div class="meta" style="text-align:right;">${pct}%</div></div>`;
       teamEl.appendChild(row);
     }
   }
 }
-
-/* ---------------- PENGATURAN ---------------- */
-async function renderPengaturan(container){
-  const p = currentPerson();
-  const wrap = document.createElement('div');
-  wrap.innerHTML = `
-    <div class="view-title"><div class="badge-ico">&#9881;&#65039;</div><div><h2>Pengaturan</h2><p>${p.nama} - ${p.jabatan}</p></div></div>
-
-    <div class="card">
-      <h3 style="font-size:15px; margin-bottom:14px;">Foto Profil</h3>
-      <div style="display:flex; align-items:center; gap:16px;">
-        ${avatarHtml(p,'xl')}
-        <div>
-          <input type="file" accept="image/*" id="f-avatar">
-          <div style="font-size:12.5px; color:var(--ink-soft); margin-top:6px;">JPG/PNG, otomatis diperkecil.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 style="font-size:15px; margin-bottom:14px;">Ganti PIN</h3>
-      <div class="row">
-        <div class="field"><label>PIN Lama</label><input type="password" id="f-oldpin" inputmode="numeric" style="width:140px;"></div>
-        <div class="field"><label>PIN Baru</label><input type="password" id="f-newpin" inputmode="numeric" style="width:140px;"></div>
-        <div class="field"><label>Ulangi PIN Baru</label><input type="password" id="f-newpin2" inputmode="numeric" style="width:140px;"></div>
-      </div>
-      <button class="btn-primary" id="btn-ganti-pin">Simpan PIN Baru</button>
-    </div>
-
-    ${p.isLead ? `
-    <div class="card">
-      <h3 style="font-size:15px; margin-bottom:6px;">Banner Aplikasi</h3>
-      <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 14px;">Foto ini tampil di bagian atas untuk semua anggota tim (misalnya foto gedung DPRD).</p>
-      <input type="file" accept="image/*" id="f-banner">
-    </div>` : ''}
-  `;
-  container.appendChild(wrap);
-
-  wrap.querySelector('#f-avatar').addEventListener('change', async (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    showToast('Mengunggah foto profil...');
-    try{
-      const dataUrl = await compressImageFile(file);
-      const res = await fetch(WEB_APP_URL, {
-        method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify({ action:'updateavatar', personId:p.id, avatarBase64:dataUrl })
-      });
-      const data = await res.json();
-      if(!data.ok) throw new Error(data.error);
-      p.avatarUrl = data.url;
-      showToast('Foto profil diperbarui');
-      render();
-    }catch(err){ showToast('Gagal upload: ' + err.message); }
-  });
-
-  wrap.querySelector('#btn-ganti-pin').addEventListener('click', async ()=>{
-    const oldPin = wrap.querySelector('#f-oldpin').value.trim();
-    const newPin = wrap.querySelector('#f-newpin').value.trim();
-    const newPin2 = wrap.querySelector('#f-newpin2').value.trim();
-    if(!oldPin || !newPin){ showToast('Isi semua kolom PIN'); return; }
-    if(newPin !== newPin2){ showToast('PIN baru tidak sama'); return; }
-    try{
-      const res = await fetch(WEB_APP_URL, {
-        method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify({ action:'changepin', personId:p.id, oldPin, newPin })
-      });
-      const data = await res.json();
-      if(!data.ok) throw new Error(data.error);
-      showToast('PIN berhasil diganti');
-      wrap.querySelector('#f-oldpin').value='';
-      wrap.querySelector('#f-newpin').value='';
-      wrap.querySelector('#f-newpin2').value='';
-    }catch(err){ showToast('Gagal: ' + err.message); }
-  });
-
-  const bannerInput = wrap.querySelector('#f-banner');
-  if(bannerInput){
-    bannerInput.addEventListener('change', async (e)=>{
-      const file = e.target.files[0];
-      if(!file) return;
-      showToast('Mengunggah banner...');
-      try{
-        const dataUrl = await compressImageFile(file);
-        const res = await fetch(WEB_APP_URL, {
-          method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: JSON.stringify({ action:'setbanner', personId:p.id, bannerBase64:dataUrl })
-        });
-        const data = await res.json();
-        if(!data.ok) throw new Error(data.error);
-        BANNER_URL = data.url;
-        showToast('Banner diperbarui untuk semua orang');
-        renderTopbar();
-      }catch(err){ showToast('Gagal: ' + err.message); }
-    });
-  }
-}
-
-async function loadRoster(){
-  if(!storageReady()){
-    document.getElementById('main').innerHTML = `
-      <div class="view-title"><h2>Belum tersambung</h2></div>
-      <div class="card"><div class="empty">Aplikasi belum disambungkan ke Google Sheets.</div></div>`;
-    return false;
-  }
-  try{
-    const res = await fetch(`${WEB_APP_URL}?action=roster`);
-    const data = await res.json();
-    if(data.ok && Array.isArray(data.people)){
-      PEOPLE = data.people;
-      BANNER_URL = data.bannerUrl || '';
-      return true;
-    }
-    throw new Error(data.error || 'Format data tidak sesuai');
-  }catch(e){
-    console.error(e);
-    document.getElementById('main').innerHTML = `
-      <div class="view-title"><h2>Gagal memuat daftar anggota</h2></div>
-      <div class="card"><div class="empty">${e.message}. Pastikan internet aktif dan URL Web App benar, lalu muat ulang halaman ini.</div></div>`;
-    return false;
-  }
-}
-
-async function init(){
-  document.getElementById('main').innerHTML = '<div class="card"><div class="empty">Memuat aplikasi...</div></div>';
-  const ok = await loadRoster();
-  renderTopbar();
-  if(ok) render();
-}
-
-init();
-</script>
-
-<!-- =====================================================================
-     MODUL UI ABSENSI / PRESENSI - TIM IT DPRD LANGKAT
-     Sudah ditempel langsung di index.html GitHub (sebelum </body>).
-     Memakai yang sudah ada di index.html: WEB_APP_URL, showToast,
-     currentPerson, avatarHtml, HARI_NAMA, BULAN_NAMA, pad2.
-     ===================================================================== -->
-<style>
- .pr-h3{font-size:15.5px; margin:0 0 14px;}
- .pr-alert{background:#FFF7E0; border:1px solid #F1D48A; color:#6B4E00; border-radius:10px; padding:10px 14px; margin-bottom:16px; font-size:13.5px;}
- .pr-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-bottom:20px;}
- .pr-tile{background:var(--card,#fff); border:1px solid var(--line,#E3E7EE); border-radius:var(--radius,12px); padding:16px 18px; display:flex; gap:14px; align-items:center; box-shadow:0 1px 3px rgba(20,40,70,.04);}
- .pr-thumb{width:64px; height:85px; border-radius:10px; object-fit:cover; background:#EEF1F5; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:26px;}
- .pr-label{font-size:12.5px; color:var(--ink-soft,#5B6B7A); font-weight:600;}
- .pr-jam{font-size:26px; font-weight:700; line-height:1.25; color:var(--ink,#132A4C);}
- .pr-jam small{font-size:12px; font-weight:600; color:var(--ink-soft,#5B6B7A);}
- .pr-muted{color:var(--ink-soft,#5B6B7A);}
- .pr-badges{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
- .pr-badge{display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; text-decoration:none; white-space:nowrap;}
- .pr-badge.ok{background:#E1F5E9; color:#1D8A55;}
- .pr-badge.warn{background:#FFF1D6; color:#A15C00;}
- .pr-badge.bad{background:#FBE7E5; color:#C0392B;}
- .pr-badge.info{background:#E8F0FE; color:#2F6FE4;}
- .pr-langkah{display:flex; gap:14px; padding:14px 0; border-bottom:1px dashed var(--line,#E3E7EE);}
- .pr-no{width:28px; height:28px; border-radius:50%; background:var(--accent,#2F6FE4); color:var(--ink,#fff); font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px;}
- .pr-langkah-isi{flex:1; min-width:0;}
- .pr-langkah-judul{font-weight:700; margin-bottom:8px;}
- .pr-lokasi{padding:10px 12px; border-radius:10px; background:#F4F6F9; font-size:13.5px; margin-bottom:8px;}
- .pr-lokasi.ok{background:#E1F5E9; color:#14633D;}
- .pr-lokasi.warn{background:#FFF1D6; color:#7A4600;}
- .pr-lokasi.bad{background:#FBE7E5; color:#A33126;}
- .pr-lokasi a{color:inherit;}
- .pr-kecil-teks{font-size:12px; margin-top:4px;}
- .pr-kecil{padding:6px 12px !important; font-size:13px !important;}
- .pr-kamera{position:relative; display:flex; align-items:center; justify-content:center; gap:8px; border:2px dashed var(--accent,#2F6FE4); border-radius:12px; padding:16px; cursor:pointer; font-weight:600; color:var(--ink,#2F6FE4); background:var(--accent-soft,#E8F0FE); max-width:360px;}
- .pr-kamera input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;}
- .pr-preview{display:block; width:180px; max-width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:12px; margin-top:10px; border:1px solid var(--line,#E3E7EE);}
- .pr-tombol-besar{width:100%; margin-top:18px; padding:15px !important; font-size:16.5px !important;}
- .pr-tombol-besar:disabled{opacity:.5; cursor:not-allowed;}
- .pr-info-siap{font-size:12.5px; color:var(--ink-soft,#5B6B7A); text-align:center; margin-top:6px; min-height:16px;}
- .pr-catatan{font-size:12px; color:var(--ink-soft,#5B6B7A); margin:8px 0 0; text-align:center;}
- .pr-link-btn{background:none; border:none; color:var(--ink2,#2F6FE4); cursor:pointer; font-size:13px; text-decoration:underline; padding:4px 0; margin-top:8px;}
- .pr-izin summary{cursor:pointer; font-weight:600;}
- .pr-izin-isi{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-top:14px;}
- .pr-izin-isi .field{margin-bottom:0;}
- .pr-selesai{background:#E1F5E9 !important; border-color:#BFE6CF !important; color:#14633D; font-size:15px;}
- .pr-scroll{overflow-x:auto;}
- .pr-tabel td{vertical-align:middle;}
- .pr-sel{display:flex; gap:8px; align-items:center;}
- .pr-mini{width:34px; height:45px; object-fit:cover; border-radius:6px; border:1px solid var(--line,#E3E7EE); display:block;}
- .pr-teks-warn{color:#A15C00;} .pr-teks-ok{color:#1D8A55;}
- .pr-overlay{position:fixed; inset:0; background:rgba(20,25,35,.55); display:flex; align-items:center; justify-content:center; z-index:1500; padding:16px;}
- .pr-modal{background:var(--card,#fff); border-radius:14px; padding:22px 24px; width:400px; max-width:100%; box-shadow:0 20px 50px rgba(0,0,0,.25); font-size:14.5px;}
- .pr-modal ul{margin:8px 0 0; padding-left:20px;}
- .pr-modal-aksi{display:flex; gap:8px; margin-top:18px;}
- .pr-modal-aksi button{flex:1;}
- .pr-tim-head{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
- .pr-tim-kontrol{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
- .pr-export{margin-top:22px; padding-top:18px; border-top:1px solid var(--line,#E3E7EE);}
- .pr-export-kontrol{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px;}
- .pr-angka-warn{color:#A15C00; font-weight:700;}
- .pr-angka-bad{color:#C0392B; font-weight:700;}
- .pr-orang{display:flex; align-items:center; gap:10px;}
- @media (max-width:640px){ .pr-tabel td[colspan]{display:block;} .pr-tim-kontrol, .pr-export-kontrol{flex-direction:column; align-items:stretch;} }
- @media (max-width:600px){ .pr-jam{font-size:22px;} .pr-langkah{gap:10px;} .pr-thumb{width:54px; height:72px;} }
-</style>
-
-<script>
-/* ======================= KONEKSI KE BACKEND =======================
-   Di GitHub: POST ke WEB_APP_URL { action:'presensi', fn, args }.
-   Jika dibuka langsung dari URL /exec Apps Script: pakai google.script.run. */
-async function prCallServer(fn, ...args){
- if(typeof google !== 'undefined' && google.script && google.script.run){
- return new Promise((resolve, reject) => {
- google.script.run.withSuccessHandler(resolve)
- .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[fn](...args);
- });
- }
- if(typeof WEB_APP_URL === 'undefined' || String(WEB_APP_URL).indexOf('https://') !== 0) throw new Error('WEB_APP_URL belum diisi.');
- let res;
- try{
- res = await fetch(WEB_APP_URL, {
- method:'POST',
- headers:{ 'Content-Type':'text/plain;charset=utf-8' },
- body: JSON.stringify({ action:'presensi', fn, args })
- });
- }catch(e){ throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet.'); }
- const teks = await res.text();
- try{ return JSON.parse(teks); }
- catch(e){ throw new Error('Respons server tidak valid. Pastikan Code.gs & Presensi.gs sudah di-deploy versi baru.'); }
-}
-
-/* ======================= STATE & UTILITAS ======================= */
-const PR_STATE = { data:null, lokasi:null, fotoAsli:null, sedangKirim:false, offsetMs:0, container:null };
 
 function prEsc(s){
  return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
