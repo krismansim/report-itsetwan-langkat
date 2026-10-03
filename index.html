@@ -948,7 +948,7 @@ async function renderTim(container){
       <div class="view-title">
         <div class="badge-ico">&#128202;</div>
         <div><h2>Rekap Tim</h2>
-        <p>Pantau laporan seluruh anggota. Untuk membuat file Excel bulanan, buka Google Sheet lalu pilih menu <strong>Laporan Kerja &rarr; Buat Laporan Bulanan</strong>.</p></div>
+        <p>Pantau laporan seluruh anggota. Anggota tanpa hak akses Absensi/Presensi tetap tampil pada rekap pekerjaan dan grafik perkembangan tugasnya, tetapi tidak dimasukkan ke Rekap/Export Daftar Hadir.</p></div>
       </div>
       <div class="month-nav">
         <select id="sel-bulan"></select>
@@ -959,87 +959,118 @@ async function renderTim(container){
     </div>
     <div id="versi-info"></div>
     <div class="card" id="team-summary"><div class="empty">Memuat...</div></div>
+    <div class="card rt-grafik-wrap" id="team-progress-chart">
+      <h3 style="font-size:16px;margin:0 0 4px;">&#128200; Perkembangan Tugas / Laporan Kerja</h3>
+      <p style="margin:0;color:var(--ink-soft);font-size:13px;">Grafik berdasarkan hari laporan kerja yang sudah diisi. Anggota tanpa akses Absensi/Presensi tetap dapat dipantau berdasarkan tugas/laporannya.</p>
+      <div class="rt-grafik-kontrol">
+        <label style="font-size:13px;font-weight:600;">Anggota:
+          <select id="rt-grafik-person" style="margin-left:6px;min-width:230px;"></select>
+        </label>
+        <span id="rt-grafik-status" style="font-size:12px;color:var(--ink-soft);"></span>
+      </div>
+      <div class="rt-grafik" id="rt-grafik-box"><div class="empty">Memuat grafik...</div></div>
+    </div>
     <div id="detail-area"></div>
   `;
   container.appendChild(wrap);
 
+  const infoEl = wrap.querySelector('#versi-info');
   wrap.querySelector('#btn-cek-versi').addEventListener('click', async ()=>{
-    const infoEl = wrap.querySelector('#versi-info');
     infoEl.innerHTML = '<p class="empty">Menghubungi backend...</p>';
     if(!storageReady()){
-      infoEl.innerHTML = '<p style="color:var(--libur);">WEB_APP_URL belum diisi.</p>';
-      return;
+      infoEl.innerHTML = '<p style="color:var(--libur);">WEB_APP_URL belum diisi.</p>'; return;
     }
     try{
       const res = await fetch(`${WEB_APP_URL}?action=version`);
       const data = await res.json();
-      if(data.ok){
-        infoEl.innerHTML = `<p style="color:var(--ok);">&#9989; Terhubung. Versi backend: <strong>${data.version}</strong><br>Waktu server: ${data.waktuServer}</p>`;
-      } else {
-        infoEl.innerHTML = `<p style="color:var(--libur);">Backend merespons tapi error: ${data.error}</p>`;
-      }
-    }catch(e){
-      infoEl.innerHTML = `<p style="color:var(--libur);">Tidak bisa terhubung ke backend: ${e.message}.</p>`;
-    }
+      infoEl.innerHTML = data.ok
+        ? `<p style="color:var(--ok);">&#9989; Terhubung. Versi backend: <strong>${escapeHtml(data.version)}</strong><br>Waktu server: ${escapeHtml(data.waktuServer)}</p>`
+        : `<p style="color:var(--libur);">Backend merespons tapi error: ${escapeHtml(data.error)}</p>`;
+    }catch(e){ infoEl.innerHTML = `<p style="color:var(--libur);">Tidak bisa terhubung ke backend: ${escapeHtml(e.message)}.</p>`; }
   });
 
   const selBulan = wrap.querySelector('#sel-bulan');
   BULAN_NAMA.forEach((b,i)=>{
-    const o = document.createElement('option'); o.value=i+1; o.textContent=b;
-    if(i+1===state.historyMonth) o.selected=true;
-    selBulan.appendChild(o);
+    const o=document.createElement('option'); o.value=i+1; o.textContent=b;
+    if(i+1===state.historyMonth) o.selected=true; selBulan.appendChild(o);
   });
   const selTahun = wrap.querySelector('#sel-tahun');
   const thisYear = new Date().getFullYear();
-  for(let y=thisYear-1; y<=thisYear+1; y++){
-    const o = document.createElement('option'); o.value=y; o.textContent=y;
-    if(y===state.historyYear) o.selected=true;
-    selTahun.appendChild(o);
+  for(let y=thisYear-1;y<=thisYear+1;y++){
+    const o=document.createElement('option'); o.value=y; o.textContent=y;
+    if(y===state.historyYear) o.selected=true; selTahun.appendChild(o);
+  }
+
+  const grafikPerson = wrap.querySelector('#rt-grafik-person');
+  PEOPLE.forEach(p=>{
+    const o=document.createElement('option'); o.value=p.id; o.textContent=p.nama;
+    grafikPerson.appendChild(o);
+  });
+
+  function escapeHtml(str){
+    const d=document.createElement('div'); d.textContent=String(str??''); return d.innerHTML;
+  }
+  function renderTaskLineChart(entries, year, month, person){
+    const days = new Date(year, month, 0).getDate();
+    const points=[];
+    let kumulatif=0;
+    for(let d=1;d<=days;d++){
+      const key=`${year}-${pad2(month)}-${pad2(d)}`;
+      const ada=!!entries[key];
+      if(ada) kumulatif++;
+      points.push({d,ada,kumulatif,pct:days?Math.round(kumulatif/days*100):0});
+    }
+    const W=980,H=250,L=54,R=20,T=22,B=42, PW=W-L-R, PH=H-T-B;
+    const maxY=100;
+    const px=d=>L+((d-1)/Math.max(1,days-1))*PW;
+    const py=v=T+(1-v/maxY)*PH;
+    const path=points.map((q,i)=>`${i?'L':'M'} ${px(q.d).toFixed(1)} ${py(q.pct).toFixed(1)}`).join(' ');
+    const dots=points.filter(q=>q.ada).map(q=>`<circle cx="${px(q.d).toFixed(1)}" cy="${py(q.pct).toFixed(1)}" r="4" fill="currentColor"><title>${q.d} ${BULAN_NAMA[month-1]}: ${q.pct}% kumulatif</title></circle>`).join('');
+    const grid=[0,25,50,75,100].map(v=>{
+      const y=py(v); return `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#E6E9E3"/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#69736D">${v}%</text>`;
+    }).join('');
+    const labels=[];
+    for(let d=1;d<=days;d+=Math.max(1,Math.ceil(days/8))){ labels.push(`<text x="${px(d)}" y="${H-14}" text-anchor="middle" font-size="11" fill="#69736D">${d}</text>`); }
+    labels.push(`<text x="${W/2}" y="${H-2}" text-anchor="middle" font-size="11" fill="#69736D">Tanggal</text>`);
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik perkembangan laporan kerja ${escapeHtml(person.nama)}">${grid}<line x1="${L}" y1="${T}" x2="${L}" y2="${H-B}" stroke="#9AA39D"/><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#9AA39D"/><path d="${path}" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}</svg>`;
+  }
+
+  async function loadGrafik(){
+    const box=wrap.querySelector('#rt-grafik-box'), status=wrap.querySelector('#rt-grafik-status');
+    const pid=grafikPerson.value; const person=PEOPLE.find(x=>x.id===pid);
+    box.innerHTML='<div class="empty">Memuat grafik...</div>';
+    if(!person) return;
+    try{
+      const entries=await getEntriesForMonth(pid,state.historyYear,state.historyMonth);
+      const filled=Object.keys(entries).length;
+      const aksesPresensi=!!(person.isLead || (person.access && person.access.presensi));
+      const aksesPdf=!!(person.isLead || (person.access && person.access.laporanPdf));
+      status.innerHTML=`${aksesPresensi?'<span class="rt-status presensi">Absensi/Presensi: aktif</span>':'<span class="rt-status no-presensi">Absensi/Presensi: tidak diberikan</span>'} <span class="rt-status ${aksesPdf?'presensi':'no-presensi'}">Arsip PDF: ${aksesPdf?'diizinkan':'tidak diberikan'}</span> &nbsp; ${filled} hari laporan terisi`;
+      box.innerHTML=renderTaskLineChart(entries,state.historyYear,state.historyMonth,person);
+    }catch(e){ box.innerHTML=`<div class="empty">Gagal memuat grafik: ${escapeHtml(e.message)}</div>`; }
   }
 
   async function loadSummary(){
-    const summaryEl = wrap.querySelector('#team-summary');
-    summaryEl.innerHTML = '<div class="empty">Memuat...</div>';
-    const year = state.historyYear, month = state.historyMonth;
-    const daysInMonth = new Date(year, month, 0).getDate();
-    summaryEl.innerHTML = '';
+    const summaryEl=wrap.querySelector('#team-summary'); summaryEl.innerHTML='<div class="empty">Memuat...</div>';
+    const year=state.historyYear, month=state.historyMonth, daysInMonth=new Date(year,month,0).getDate();
+    summaryEl.innerHTML='';
     for(const p of PEOPLE){
-      const entries = await getEntriesForMonth(p.id, year, month);
-      const filled = Object.keys(entries).length;
-      const pct = Math.round((filled/daysInMonth)*100);
-      const row = document.createElement('div');
-      row.className = 'team-card';
-      row.innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px;">
-          ${avatarHtml(p)}
-          <div>
-            <strong>${p.nama}</strong>
-            <div class="meta">${p.jabatan} - ${filled} dari ${daysInMonth} hari terisi</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn-secondary" data-detail="${p.id}">Lihat / Edit</button>
-        </div>
-      `;
+      const entries=await getEntriesForMonth(p.id,year,month); const filled=Object.keys(entries).length; const pct=Math.round((filled/daysInMonth)*100);
+      const presensiAktif=!!(p.isLead || (p.access && p.access.presensi));
+      const pdfAktif=!!(p.isLead || (p.access && p.access.laporanPdf));
+      const row=document.createElement('div'); row.className='team-card';
+      row.innerHTML=`<div style="display:flex;align-items:center;gap:12px;">${avatarHtml(p)}<div><strong>${escapeHtml(p.nama)}</strong><div class="meta">${escapeHtml(p.jabatan)} - ${filled} dari ${daysInMonth} hari terisi</div><div><span class="rt-status ${presensiAktif?'presensi':'no-presensi'}">${presensiAktif?'Presensi aktif':'Tanpa akses Presensi'}</span> <span class="rt-status ${pdfAktif?'presensi':'no-presensi'}">${pdfAktif?'Arsip PDF':'Tanpa Arsip PDF'}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div></div><div style="display:flex;gap:8px;"><button class="btn-secondary" data-grafik="${escapeHtml(p.id)}">Grafik Tugas</button><button class="btn-secondary" data-detail="${escapeHtml(p.id)}">Lihat / Edit</button></div>`;
       summaryEl.appendChild(row);
     }
-    summaryEl.querySelectorAll('[data-detail]').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const detailArea = wrap.querySelector('#detail-area');
-        detailArea.innerHTML = `<h3 style="margin-bottom:10px;">Detail - ${PEOPLE.find(p=>p.id===btn.dataset.detail).nama}</h3>`;
-        await renderRiwayat(detailArea, btn.dataset.detail, true);
-      });
-    });
+    summaryEl.querySelectorAll('[data-detail]').forEach(btn=>btn.addEventListener('click',async()=>{const detailArea=wrap.querySelector('#detail-area'); const p=PEOPLE.find(x=>x.id===btn.dataset.detail); detailArea.innerHTML=`<h3 style="margin-bottom:10px;">Detail - ${escapeHtml(p?p.nama:'Anggota')}</h3>`; await renderRiwayat(detailArea,btn.dataset.detail,true);}));
+    summaryEl.querySelectorAll('[data-grafik]').forEach(btn=>btn.addEventListener('click',()=>{grafikPerson.value=btn.dataset.grafik; loadGrafik(); wrap.querySelector('#team-progress-chart').scrollIntoView({behavior:'smooth',block:'start'});}));
   }
 
-  selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
-  selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
-
-  renderRekapPresensiTim(wrap); // kartu Presensi Tim (modul Absensi/Presensi)
-  await loadSummary();
+  async function refresh(){ state.historyMonth=+selBulan.value; state.historyYear=+selTahun.value; await loadSummary(); await loadGrafik(); }
+  selBulan.addEventListener('change',refresh); selTahun.addEventListener('change',refresh); grafikPerson.addEventListener('change',loadGrafik);
+  await loadSummary(); await loadGrafik();
+  renderRekapPresensiTim(wrap);
 }
-
 /* ---------------- MAIN RENDER ---------------- */
 /* ---------------- SINKRONISASI URL (supaya alamat berubah tiap pindah halaman) ---------------- */
 function syncUrlHash(){
@@ -1979,6 +2010,13 @@ async function renderRekapPresensiTim(container){
      (di bawah modul presensi). Kode lain TIDAK perlu diubah.
      ===================================================================== -->
 <style>
+ .rt-grafik-wrap{margin-top:18px; padding-top:18px; border-top:1px solid var(--line);}
+ .rt-grafik-kontrol{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0 14px;}
+ .rt-grafik{width:100%; overflow:auto; border:1px solid var(--line); border-radius:10px; background:#fff; padding:10px;}
+ .rt-grafik svg{display:block; min-width:720px; width:100%; height:260px;}
+ .rt-status{display:inline-block; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:700; margin-top:4px;}
+ .rt-status.no-presensi{background:#F1F3F5; color:#666;}
+ .rt-status.presensi{background:var(--ok-soft); color:#28663A;}
  .ex-kontrol{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
  .ex-cek{display:flex; align-items:center; gap:6px; font-size:13.5px;}
  .ex-info{font-size:12.5px; color:var(--ink-soft); margin-top:8px;}
