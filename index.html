@@ -1849,6 +1849,20 @@ async function prMuatRiwayat(box, p){
 }
 
 /* ======================= PANEL TEAM LEADER (di tab Laporan Tim) ======================= */
+// Fungsi global khusus modul Presensi. renderRekapPresensiTim berada di luar IIFE
+// modul export laporan, jadi tidak boleh bergantung pada fungsi lokal IIFE tersebut.
+function prMingguDalamBulan_(y, m){
+ const n = new Date(y, m, 0).getDate(), out = [];
+ let cur = [];
+ for(let d = 1; d <= n; d++){
+  cur.push(d);
+  if(new Date(y, m - 1, d).getDay() === 0 || d === n){
+   out.push(cur);
+   cur = [];
+  }
+ }
+ return out;
+}
 async function renderRekapPresensiTim(container){
  const p = currentPerson();
  if(!p || !p.isLead) return;
@@ -1932,7 +1946,7 @@ async function renderRekapPresensiTim(container){
 
  const expBulan = el.querySelector('#pr-exp-bulan'), expTahun = el.querySelector('#pr-exp-tahun'), expMinggu = el.querySelector('#pr-exp-minggu');
  const isiPeriodeExport = () => {
-   const y=+expTahun.value, m=+expBulan.value, ww=mingguDalamBulan(y,m), bl=BULAN_NAMA[m-1];
+   const y=+expTahun.value, m=+expBulan.value, ww=prMingguDalamBulan_(y,m), bl=BULAN_NAMA[m-1];
    expMinggu.innerHTML = `<option value="0">Satu bulan penuh (${ww.length} minggu)</option>` + ww.map((h,i)=>`<option value="${i+1}">Minggu ke-${i+1} (${h[0]}${h.length>1?'–'+h[h.length-1]:''} ${bl})</option>`).join('');
  };
  expBulan.addEventListener('change',isiPeriodeExport); expTahun.addEventListener('change',isiPeriodeExport); isiPeriodeExport();
