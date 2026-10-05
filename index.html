@@ -432,7 +432,7 @@ function showToast(msg){
   showToast._t = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
-/* ---------------- STORAGE HELPERS (via fetch ke Apps Script) ---------------- */
+/* ---------------- STORAGE HELPERS (via fetch ke AppsScr) ---------------- */
 function storageReady(){
   return WEB_APP_URL && WEB_APP_URL.indexOf('https://') === 0;
 }
@@ -1327,9 +1327,6 @@ init();
 
 <!-- =====================================================================
      MODUL UI ABSENSI / PRESENSI - TIM IT DPRD LANGKAT
-     Sudah ditempel langsung di index.html GitHub (sebelum </body>).
-     Memakai yang sudah ada di index.html: WEB_APP_URL, showToast,
-     currentPerson, avatarHtml, HARI_NAMA, BULAN_NAMA, pad2.
      ===================================================================== -->
 <style>
  .pr-h3{font-size:15.5px; margin:0 0 14px;}
@@ -1393,8 +1390,7 @@ init();
 
 <script>
 /* ======================= KONEKSI KE BACKEND =======================
-   Di GitHub: POST ke WEB_APP_URL { action:'presensi', fn, args }.
-   Jika dibuka langsung dari URL /exec Apps Script: pakai google.script.run. */
+   Di GitHub: POST ke WEB_APP_URL { action:'presensi', fn, args }. */
 async function prCallServer(fn, ...args){
  if(typeof google !== 'undefined' && google.script && google.script.run){
  return new Promise((resolve, reject) => {
@@ -1984,8 +1980,6 @@ async function renderRekapPresensiTim(container){
 </script>
 <!-- =====================================================================
      MODUL TAMBAHAN v15: EXPORT LAPORAN (SEBULAN / PER MINGGU) & TANDA TANGAN
-     Cara pasang: tempel SELURUH blok ini tepat SEBELUM </body> di index.html
-     (di bawah modul presensi). Kode lain TIDAK perlu diubah.
      ===================================================================== -->
 <style>
  .rt-grafik-wrap{margin-top:18px; padding-top:18px; border-top:1px solid var(--line);}
@@ -2400,7 +2394,6 @@ async function renderRekapPresensiTim(container){
     <button class="btn-secondary" data-filter="Laporan Kerja">📄 Laporan Kerja</button><button class="btn-secondary" data-filter="Daftar Hadir">🗓️ Daftar Hadir</button><button class="btn-secondary" data-filter="Semua">📚 Semua</button>
    </div>
    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;">
-    <div class="field" style="flex:2;min-width:220px;margin:0;"><label>Pencarian</label><input type="search" data-f="cari" placeholder="Cari nama, file, periode, atau keterangan…" autocomplete="off"></div>
     <div class="field" style="flex:1;min-width:190px;margin:0;"><label>Anggota / Tim</label><select data-f="anggota"><option value="">Semua anggota / tim</option></select></div>
     <div class="field" style="flex:1;min-width:150px;margin:0;"><label>Bulan</label><select data-f="bulan"><option value="">Semua bulan</option></select></div>
     <div class="field" style="flex:1;min-width:130px;margin:0;"><label>Tahun</label><select data-f="tahun"><option value="">Semua tahun</option></select></div>
@@ -2409,7 +2402,6 @@ async function renderRekapPresensiTim(container){
    <div data-f="ringkasan" style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;"></div>
    <div data-f="list"><div class="empty">Memuat…</div></div>`;wrap.appendChild(listCard);
   const listEl=listCard.querySelector('[data-f="list"]'); let semua=[]; let filter='Laporan Kerja';
-  const cariEl=listCard.querySelector('[data-f="cari"]');
   const anggotaEl=listCard.querySelector('[data-f="anggota"]');
   const bulanEl=listCard.querySelector('[data-f="bulan"]');
   const tahunEl=listCard.querySelector('[data-f="tahun"]');
@@ -2442,7 +2434,6 @@ async function renderRekapPresensiTim(container){
     if([...bulanEl.options].some(o=>o.value===curM)) bulanEl.value=curM;
   }
   function renderList(){
-    const q=String(cariEl.value||'').trim().toLowerCase();
     const anggota=anggotaEl.value, bulan=bulanEl.value, tahun=tahunEl.value;
     let data=filter==='Semua'?semua:semua.filter(x=>x.jenis===filter);
     data=data.filter(x=>{
@@ -2450,18 +2441,17 @@ async function renderRekapPresensiTim(container){
       const pi=periodeInfo(x.periode);
       if(tahun && pi.year!==tahun) return false;
       if(bulan && pi.month!==bulan) return false;
-      if(q){const hay=[x.jenis,x.namaAnggota,x.periode,x.namaFile,x.keterangan,x.diunggahOleh,x.diunggahPada].map(v=>String(v||'').toLowerCase()).join(' ');if(hay.indexOf(q)<0)return false;}
       return true;
     });
     ringkasanEl.textContent=`Menampilkan ${data.length} arsip${semua.length?' dari '+semua.length+' total arsip':''}.`;
-    if(!data.length){listEl.innerHTML=`<div class="empty">Tidak ada arsip yang sesuai dengan pencarian/filter saat ini.</div>`;return;}
+    if(!data.length){listEl.innerHTML=`<div class="empty">Tidak ada arsip yang sesuai dengan filter saat ini.</div>`;return;}
     listEl.innerHTML=`<div style="overflow:auto"><table><thead><tr><th>Jenis</th><th>Anggota</th><th>Periode</th><th>File</th><th>Diunggah</th><th>Aksi</th></tr></thead><tbody>${data.map(x=>`<tr><td data-label="Jenis">${esc(x.jenis)}</td><td data-label="Anggota">${esc(x.namaAnggota)}</td><td data-label="Periode">${esc(x.periode)}</td><td data-label="File">${esc(x.namaFile)}</td><td data-label="Diunggah">${esc(x.diunggahPada)}</td><td class="row-actions"><button class="btn-secondary" data-pdf="${esc(x.pdfId)}">⬇️ Download</button></td></tr>`).join('')}</tbody></table></div>`;
     listEl.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await exPost('pdf_download',{pdfId:b.dataset.pdf});const bytes=Uint8Array.from(atob(r.base64),c=>c.charCodeAt(0));const blob=new Blob([bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=r.namaFile;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}catch(e){showToast('Gagal download: '+e.message);}b.disabled=false;});
   }
   async function muat(){listEl.innerHTML='<div class="empty">Memuat…</div>';try{const r=await exPost('pdf_list');semua=r.data||[];isiFilterAnggota();isiFilterPeriode();renderList();}catch(e){listEl.innerHTML=`<div class="empty" style="color:var(--libur)">${esc(e.message)}</div>`;}}
   listCard.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;renderList();});
-  [cariEl,anggotaEl,bulanEl,tahunEl].forEach(el=>el.addEventListener(el.tagName==='INPUT'?'input':'change',renderList));
-  listCard.querySelector('[data-f="reset"]').onclick=()=>{cariEl.value='';anggotaEl.value='';bulanEl.value='';tahunEl.value='';filter='Laporan Kerja';renderList();};
+  [anggotaEl,bulanEl,tahunEl].forEach(el=>el.addEventListener('change',renderList));
+  listCard.querySelector('[data-f="reset"]').onclick=()=>{anggotaEl.value='';bulanEl.value='';tahunEl.value='';filter='Laporan Kerja';renderList();};
   await muat();
  }
 
