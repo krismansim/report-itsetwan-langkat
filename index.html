@@ -1327,9 +1327,6 @@ init();
 
 <!-- =====================================================================
      MODUL UI ABSENSI / PRESENSI - TIM IT DPRD LANGKAT
-     Sudah ditempel langsung di index.html GitHub (sebelum </body>).
-     Memakai yang sudah ada di index.html: WEB_APP_URL, showToast,
-     currentPerson, avatarHtml, HARI_NAMA, BULAN_NAMA, pad2.
      ===================================================================== -->
 <style>
  .pr-h3{font-size:15.5px; margin:0 0 14px;}
@@ -1392,9 +1389,7 @@ init();
 </style>
 
 <script>
-/* ======================= KONEKSI KE BACKEND =======================
-   Di GitHub: POST ke WEB_APP_URL { action:'presensi', fn, args }.
-   Jika dibuka langsung dari URL /exec Apps Script: pakai google.script.run. */
+/* ======================= KONEKSI KE BACKEND ======================= */
 async function prCallServer(fn, ...args){
  if(typeof google !== 'undefined' && google.script && google.script.run){
  return new Promise((resolve, reject) => {
@@ -1984,8 +1979,6 @@ async function renderRekapPresensiTim(container){
 </script>
 <!-- =====================================================================
      MODUL TAMBAHAN v15: EXPORT LAPORAN (SEBULAN / PER MINGGU) & TANDA TANGAN
-     Cara pasang: tempel SELURUH blok ini tepat SEBELUM </body> di index.html
-     (di bawah modul presensi). Kode lain TIDAK perlu diubah.
      ===================================================================== -->
 <style>
  .rt-grafik-wrap{margin-top:18px; padding-top:18px; border-top:1px solid var(--line);}
