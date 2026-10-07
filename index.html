@@ -443,6 +443,22 @@
     .cta-banner{flex-direction:column; align-items:flex-start;}
     .cta-banner button{width:100%;}
   }
+
+  /* PATCH HP 381–480px: header + tanggal/waktu sebelum login */
+  @media (min-width:381px) and (max-width:480px){
+    .app{display:flex !important; flex-direction:column !important;}
+    .main-scroll{display:contents !important;}
+    .topbar{display:flex !important; order:1 !important; width:100% !important; min-height:72px !important; height:auto !important; padding:9px 10px !important; box-sizing:border-box !important; overflow:visible !important; position:relative !important; flex-direction:row !important; align-items:center !important; justify-content:space-between !important;}
+    .topbar > div:first-child{display:block !important; flex:0 0 0 !important; width:0 !important; min-width:0 !important;}
+    .topbar-right{width:100% !important; min-width:0 !important; display:flex !important; align-items:center !important; justify-content:flex-end !important; gap:8px !important; flex-wrap:nowrap !important;}
+    .topbar-clock{display:block !important; flex:0 1 auto !important; min-width:0 !important; font-size:11px !important; line-height:1.35 !important; text-align:right !important; white-space:nowrap !important; overflow:visible !important;}
+    .topbar-clock .row{display:flex !important; align-items:center !important; justify-content:flex-end !important; gap:5px !important; white-space:nowrap !important;}
+    .topbar-user{min-width:0 !important;}
+    .topbar-logout{flex:0 0 auto !important;}
+    .sidebar{order:2 !important;}
+    .main{order:3 !important;}
+  }
+
 </style>
 </head>
 <body>
