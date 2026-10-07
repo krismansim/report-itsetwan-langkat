@@ -193,6 +193,179 @@
   .cta-banner h3{color:#fff; font-size:19px;}
   .cta-banner p{margin:6px 0 0; color:#D8E0EA; font-size:13.5px;}
 
+  /* =========================================================
+     RESPONSIVE HP — TIDAK MENGUBAH LOGIKA MENU/FITUR
+     Urutan HP: Header -> Keterangan/Brand -> Menu/Role -> Konten
+     ========================================================= */
+  @media (max-width: 640px){
+    .app{
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+    }
+
+    /* main-scroll dibuka hanya pada layout HP agar topbar bisa
+       ditempatkan paling atas tanpa memindahkan elemen/fungsi JS. */
+    .main-scroll{
+      display:contents;
+    }
+
+    /* 1. HEADER PALING ATAS */
+    .topbar{
+      order:1;
+      width:100%;
+      height:auto;
+      min-height:64px;
+      padding:9px 12px;
+      display:flex;
+      flex-direction:row;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      position:relative;
+      overflow:hidden;
+      box-sizing:border-box;
+    }
+    .topbar > div:first-child{
+      display:block;
+      flex:1 1 auto;
+      min-width:0;
+    }
+    .topbar-right{
+      width:auto;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:nowrap;
+      min-width:0;
+    }
+    .topbar-clock{
+      font-size:11px;
+      line-height:1.3;
+      white-space:nowrap;
+    }
+    .topbar-user{
+      min-width:0;
+      max-width:48vw;
+      gap:7px;
+    }
+    .topbar-user .name,
+    .topbar-user .role{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .topbar-user .name{font-size:12.5px;}
+    .topbar-user .role{font-size:10px;}
+    .topbar-logout{
+      flex:0 0 auto;
+      padding:7px 10px;
+      font-size:12px;
+      border-radius:7px;
+    }
+
+    /* 2. KETERANGAN REKAP KERJA HARIAN + MENU/ROLE */
+    .sidebar{
+      order:2;
+      width:100%;
+      height:auto;
+      min-height:0;
+      max-height:none;
+      position:relative;
+      top:auto;
+      align-self:stretch;
+      box-sizing:border-box;
+      padding:18px 14px 20px;
+      gap:18px;
+      overflow:visible;
+    }
+    .brand{
+      width:100%;
+      gap:12px;
+    }
+    .brand-icon{
+      width:46px;
+      height:46px;
+      border-radius:12px;
+      font-size:21px;
+    }
+    .brand h1{
+      font-size:22px;
+      line-height:1.18;
+    }
+    .brand p{
+      font-size:12.5px;
+      margin-top:4px;
+    }
+
+    /* Menu tetap menu yang sama; hanya dibuat nyaman disentuh di HP. */
+    nav.tabs{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:5px;
+    }
+    nav.tabs button{
+      min-width:0;
+      padding:9px 8px;
+      font-size:13px;
+      gap:7px;
+    }
+    .section-label{
+      font-size:10.5px;
+      margin-left:2px;
+    }
+    .person-list{
+      width:100%;
+      gap:4px;
+    }
+    .person-btn{
+      padding:8px 7px;
+      font-size:13px;
+    }
+
+    /* 3. KONTEN */
+    .main{
+      order:3;
+      width:100%;
+      max-width:none;
+      box-sizing:border-box;
+      padding:18px 12px 30px;
+    }
+    .view-title{
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .view-title .badge-ico{
+      width:40px;
+      height:40px;
+      font-size:18px;
+    }
+    .view-title h2{font-size:20px;}
+    .view-title p{font-size:12.5px;}
+  }
+
+  @media (max-width: 380px){
+    .topbar{
+      min-height:60px;
+      padding:8px 9px;
+    }
+    .topbar-clock{
+      display:none;
+    }
+    .topbar-user{
+      max-width:calc(100vw - 115px);
+    }
+    .topbar-logout{
+      padding:7px 9px;
+      font-size:11.5px;
+    }
+    .brand h1{font-size:20px;}
+    .brand p{font-size:12px;}
+    nav.tabs{grid-template-columns:1fr;}
+  }
+
   @media (max-width: 900px){
     .app{flex-direction:column;}
     .sidebar{width:100%; position:relative; height:auto;}
@@ -1350,6 +1523,9 @@ init();
 
 <!-- =====================================================================
      MODUL UI ABSENSI / PRESENSI - TIM IT DPRD LANGKAT
+     Sudah ditempel langsung di index.html GitHub (sebelum </body>).
+     Memakai yang sudah ada di index.html: WEB_APP_URL, showToast,
+     currentPerson, avatarHtml, HARI_NAMA, BULAN_NAMA, pad2.
      ===================================================================== -->
 <style>
  .pr-h3{font-size:15.5px; margin:0 0 14px;}
@@ -1412,7 +1588,9 @@ init();
 </style>
 
 <script>
-/* ======================= KONEKSI KE BACKEND ======================= */
+/* ======================= KONEKSI KE BACKEND =======================
+   Di GitHub: POST ke WEB_APP_URL { action:'presensi', fn, args }.
+   Jika dibuka langsung dari URL /exec Apps Script: pakai google.script.run. */
 async function prCallServer(fn, ...args){
  if(typeof google !== 'undefined' && google.script && google.script.run){
  return new Promise((resolve, reject) => {
@@ -2002,6 +2180,8 @@ async function renderRekapPresensiTim(container){
 </script>
 <!-- =====================================================================
      MODUL TAMBAHAN v15: EXPORT LAPORAN (SEBULAN / PER MINGGU) & TANDA TANGAN
+     Cara pasang: tempel SELURUH blok ini tepat SEBELUM </body> di index.html
+     (di bawah modul presensi). Kode lain TIDAK perlu diubah.
      ===================================================================== -->
 <style>
  .rt-grafik-wrap{margin-top:18px; padding-top:18px; border-top:1px solid var(--line);}
