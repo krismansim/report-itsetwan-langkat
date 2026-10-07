@@ -81,10 +81,9 @@
   .avatar.lg{width:44px; height:44px; font-size:16px;}
   .avatar.xl{width:72px; height:72px; font-size:24px;}
 
-  .logout-btn{background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22); color:#fff; padding:8px 12px; border-radius:9px; cursor:pointer; font-size:13px; font-weight:600; display:flex; align-items:center; gap:7px; white-space:nowrap;}
-  .logout-btn:hover{background:rgba(255,255,255,0.18);}
-  .topbar-logout{display:flex; align-items:center; justify-content:center;}
-  .topbar-logout .logout-btn{margin:0;}
+  .logout-btn{margin-top:0; text-align:center; background:#C0392B; border:1px solid #A93226; color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px; white-space:nowrap;}
+  .logout-btn:hover{background:#A93226; color:#fff;}
+  .topbar-logout{flex-shrink:0;}
 
   /* Top bar */
   .topbar{
@@ -206,6 +205,28 @@
     .team-card{flex-wrap:wrap;}
   }
 
+  @media (max-width: 640px){
+    .topbar-logout{
+      padding:7px 10px;
+      font-size:12px;
+    }
+    .topbar-right{
+      gap:10px;
+    }
+    .topbar-user{
+      min-width:0;
+    }
+    .topbar-user > div{
+      min-width:0;
+    }
+    .topbar-user .name,
+    .topbar-user .role{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+  }
+
   /* Layar HP: tabel Riwayat berubah jadi kartu bertumpuk supaya tidak perlu di-zoom */
   @media (max-width: 640px){
     .month-nav{flex-direction:column; align-items:stretch;}
@@ -262,7 +283,7 @@
       <div class="topbar-right">
         <div class="topbar-clock" id="topbarClock"></div>
         <div class="topbar-user" id="topbarUser"></div>
-        <div class="topbar-logout"><button class="logout-btn" id="btn-logout-top" style="display:none;"><span class="ico">&#8617;</span> Keluar</button></div>
+        <button class="logout-btn topbar-logout" id="btn-logout-side" style="display:none;"><span class="ico">&#8617;</span> Keluar</button>
       </div>
     </div>
     <div class="main" id="main"></div>
@@ -307,6 +328,7 @@ let state = {
   historyYear: new Date().getFullYear(),
   editingKey: null,
   unlocked: new Set(),
+  pin: '',
 };
 
 function currentPerson(){ return PEOPLE.find(p=>p.id===state.personId) || null; }
@@ -332,6 +354,7 @@ async function trySwitchPerson(personId){
       if(data.ok && data.valid){
         state.unlocked.add(personId);
         state.personId = personId;
+        state.pin = entered.trim();
         state.tab = 'beranda';
         state.editingKey = null;
         closePinModal();
@@ -386,6 +409,7 @@ function closePinModal(){
 function logout(){
   if(state.personId) state.unlocked.delete(state.personId);
   state.personId = null;
+  state.pin = '';
   state.tab = 'beranda';
   state.editingKey = null;
   render();
@@ -420,11 +444,6 @@ function renderTopbar(){
     userEl.innerHTML = `${avatarHtml(p)}<div><div class="name">${p.nama}</div><div class="role">${p.jabatan}</div></div>`;
   } else {
     userEl.style.display = 'none';
-  }
-  const logoutTop = document.getElementById('btn-logout-top');
-  if(logoutTop){
-    logoutTop.style.display = p ? 'flex' : 'none';
-    logoutTop.onclick = ()=> logout();
   }
 }
 
@@ -497,21 +516,24 @@ function renderSidebar(){
 
   const currentCard = document.getElementById('currentPersonCard');
   const nav = document.getElementById('tabNav');
+  const logoutBtn = document.getElementById('btn-logout-side');
   nav.innerHTML = '';
   if(!currentPerson()){
     currentCard.innerHTML = `<div class="empty" style="color:#8CA0AF; font-size:12.5px;">Belum ada yang login</div>`;
+    logoutBtn.style.display = 'none';
     return;
   }
   const p = currentPerson();
   currentCard.innerHTML = `<div class="person-btn active" style="cursor:default;">${avatarHtml(p,'lg')}<span style="min-width:0;"><span style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;">${p.nama}</span><span class="role">${p.jabatan}</span></span></div>`;
 
-  const tabs = [
-    ['beranda','&#127968;','Beranda'],
-    ['isi','&#128221;','Isi Laporan'],
-    ['riwayat','&#128197;','Riwayat Laporan Saya'],
-    ['presensi','&#127380;','Absensi/Presensi'],
-  ];
+  const a = p.access || {};
+  const tabs = [];
+  if(a.beranda !== false) tabs.push(['beranda','&#127968;','Beranda']);
+  if(a.isiLaporan !== false) tabs.push(['isi','&#128221;','Isi Laporan']);
+  if(a.riwayat !== false) tabs.push(['riwayat','&#128197;','Riwayat Laporan Saya']);
+  if(a.presensi !== false) tabs.push(['presensi','&#127380;','Absensi/Presensi']);
   if(p.isLead) tabs.push(['tim','&#128202;','Laporan Tim']);
+  if(p.isLead || a.laporanPdf) tabs.push(['laporanPdf','&#128196;','Arsip Laporan PDF']);
   tabs.push(['pengaturan','&#9881;&#65039;','Pengaturan']);
   tabs.forEach(([key,ico,label])=>{
     const b = document.createElement('button');
@@ -521,6 +543,8 @@ function renderSidebar(){
     nav.appendChild(b);
   });
 
+  logoutBtn.style.display = 'flex';
+  logoutBtn.onclick = ()=> logout();
 }
 
 /* ---------------- FORM STATE (Isi Laporan) ---------------- */
@@ -947,7 +971,7 @@ async function renderTim(container){
       <div class="view-title">
         <div class="badge-ico">&#128202;</div>
         <div><h2>Rekap Tim</h2>
-        <p>Pantau laporan seluruh anggota. Untuk membuat file Excel bulanan, buka Google Sheet lalu pilih menu <strong>Laporan Kerja &rarr; Buat Laporan Bulanan</strong>.</p></div>
+        <p>Pantau laporan seluruh anggota. Anggota tanpa hak akses Absensi/Presensi tetap tampil pada rekap pekerjaan, tetapi tidak dimasukkan ke Rekap/Export Daftar Hadir.</p></div>
       </div>
       <div class="month-nav">
         <select id="sel-bulan"></select>
@@ -962,83 +986,53 @@ async function renderTim(container){
   `;
   container.appendChild(wrap);
 
+  const infoEl = wrap.querySelector('#versi-info');
   wrap.querySelector('#btn-cek-versi').addEventListener('click', async ()=>{
-    const infoEl = wrap.querySelector('#versi-info');
     infoEl.innerHTML = '<p class="empty">Menghubungi backend...</p>';
     if(!storageReady()){
-      infoEl.innerHTML = '<p style="color:var(--libur);">WEB_APP_URL belum diisi.</p>';
-      return;
+      infoEl.innerHTML = '<p style="color:var(--libur);">WEB_APP_URL belum diisi.</p>'; return;
     }
     try{
       const res = await fetch(`${WEB_APP_URL}?action=version`);
       const data = await res.json();
-      if(data.ok){
-        infoEl.innerHTML = `<p style="color:var(--ok);">&#9989; Terhubung. Versi backend: <strong>${data.version}</strong><br>Waktu server: ${data.waktuServer}</p>`;
-      } else {
-        infoEl.innerHTML = `<p style="color:var(--libur);">Backend merespons tapi error: ${data.error}</p>`;
-      }
-    }catch(e){
-      infoEl.innerHTML = `<p style="color:var(--libur);">Tidak bisa terhubung ke backend: ${e.message}.</p>`;
-    }
+      infoEl.innerHTML = data.ok
+        ? `<p style="color:var(--ok);">&#9989; Terhubung. Versi backend: <strong>${escapeHtml(data.version)}</strong><br>Waktu server: ${escapeHtml(data.waktuServer)}</p>`
+        : `<p style="color:var(--libur);">Backend merespons tapi error: ${escapeHtml(data.error)}</p>`;
+    }catch(e){ infoEl.innerHTML = `<p style="color:var(--libur);">Tidak bisa terhubung ke backend: ${escapeHtml(e.message)}.</p>`; }
   });
 
   const selBulan = wrap.querySelector('#sel-bulan');
   BULAN_NAMA.forEach((b,i)=>{
-    const o = document.createElement('option'); o.value=i+1; o.textContent=b;
-    if(i+1===state.historyMonth) o.selected=true;
-    selBulan.appendChild(o);
+    const o=document.createElement('option'); o.value=i+1; o.textContent=b;
+    if(i+1===state.historyMonth) o.selected=true; selBulan.appendChild(o);
   });
   const selTahun = wrap.querySelector('#sel-tahun');
   const thisYear = new Date().getFullYear();
-  for(let y=thisYear-1; y<=thisYear+1; y++){
-    const o = document.createElement('option'); o.value=y; o.textContent=y;
-    if(y===state.historyYear) o.selected=true;
-    selTahun.appendChild(o);
+  for(let y=thisYear-1;y<=thisYear+1;y++){
+    const o=document.createElement('option'); o.value=y; o.textContent=y;
+    if(y===state.historyYear) o.selected=true; selTahun.appendChild(o);
   }
 
   async function loadSummary(){
-    const summaryEl = wrap.querySelector('#team-summary');
-    summaryEl.innerHTML = '<div class="empty">Memuat...</div>';
-    const year = state.historyYear, month = state.historyMonth;
-    const daysInMonth = new Date(year, month, 0).getDate();
-    summaryEl.innerHTML = '';
+    const summaryEl=wrap.querySelector('#team-summary'); summaryEl.innerHTML='<div class="empty">Memuat...</div>';
+    const year=state.historyYear, month=state.historyMonth, daysInMonth=new Date(year,month,0).getDate();
+    summaryEl.innerHTML='';
     for(const p of PEOPLE){
-      const entries = await getEntriesForMonth(p.id, year, month);
-      const filled = Object.keys(entries).length;
-      const pct = Math.round((filled/daysInMonth)*100);
-      const row = document.createElement('div');
-      row.className = 'team-card';
-      row.innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px;">
-          ${avatarHtml(p)}
-          <div>
-            <strong>${p.nama}</strong>
-            <div class="meta">${p.jabatan} - ${filled} dari ${daysInMonth} hari terisi</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn-secondary" data-detail="${p.id}">Lihat / Edit</button>
-        </div>
-      `;
+      const entries=await getEntriesForMonth(p.id,year,month); const filled=Object.keys(entries).length; const pct=Math.round((filled/daysInMonth)*100);
+      const presensiAktif=!!(p.isLead || (p.access && p.access.presensi));
+      const pdfAktif=!!(p.isLead || (p.access && p.access.laporanPdf));
+      const row=document.createElement('div'); row.className='team-card';
+      row.innerHTML=`<div style="display:flex;align-items:center;gap:12px;">${avatarHtml(p)}<div><strong>${escapeHtml(p.nama)}</strong><div class="meta">${escapeHtml(p.jabatan)} - ${filled} dari ${daysInMonth} hari terisi</div><div><span class="rt-status ${presensiAktif?'presensi':'no-presensi'}">${presensiAktif?'Presensi aktif':'Tanpa akses Presensi'}</span> <span class="rt-status ${pdfAktif?'presensi':'no-presensi'}">${pdfAktif?'Arsip PDF':'Tanpa Arsip PDF'}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div></div><div style="display:flex;gap:8px;"><button class="btn-secondary" data-detail="${escapeHtml(p.id)}">Lihat / Edit</button></div>`;
       summaryEl.appendChild(row);
     }
-    summaryEl.querySelectorAll('[data-detail]').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        const detailArea = wrap.querySelector('#detail-area');
-        detailArea.innerHTML = `<h3 style="margin-bottom:10px;">Detail - ${PEOPLE.find(p=>p.id===btn.dataset.detail).nama}</h3>`;
-        await renderRiwayat(detailArea, btn.dataset.detail, true);
-      });
-    });
+    summaryEl.querySelectorAll('[data-detail]').forEach(btn=>btn.addEventListener('click',async()=>{const detailArea=wrap.querySelector('#detail-area'); const p=PEOPLE.find(x=>x.id===btn.dataset.detail); detailArea.innerHTML=`<h3 style="margin-bottom:10px;">Detail - ${escapeHtml(p?p.nama:'Anggota')}</h3>`; await renderRiwayat(detailArea,btn.dataset.detail,true);}));
   }
 
-  selBulan.addEventListener('change', ()=>{ state.historyMonth = +selBulan.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
-  selTahun.addEventListener('change', ()=>{ state.historyYear = +selTahun.value; wrap.querySelector('#detail-area').innerHTML=''; loadSummary(); });
-
-  renderRekapPresensiTim(wrap); // kartu Presensi Tim (modul Absensi/Presensi)
+  async function refresh(){ state.historyMonth=+selBulan.value; state.historyYear=+selTahun.value; await loadSummary(); }
+  selBulan.addEventListener('change',refresh); selTahun.addEventListener('change',refresh);
   await loadSummary();
+  renderRekapPresensiTim(wrap);
 }
-
 /* ---------------- MAIN RENDER ---------------- */
 /* ---------------- SINKRONISASI URL (supaya alamat berubah tiap pindah halaman) ---------------- */
 function syncUrlHash(){
@@ -1131,36 +1125,75 @@ async function renderBeranda(container){
   const jamSekarang = now.getHours();
   const sapaan = jamSekarang < 11 ? 'Selamat pagi' : jamSekarang < 15 ? 'Selamat siang' : jamSekarang < 18 ? 'Selamat sore' : 'Selamat malam';
 
-  wrap.innerHTML = `
-    <div class="cta-banner">
-      <div>
-        <h3>${sapaan}, ${p.nama.split(',')[0]} &#128075;</h3>
-        <p>Jangan lupa isi laporan kegiatan hari ini sebelum jam kerja berakhir.</p>
-      </div>
-      <button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">&#128221; Isi Laporan Sekarang</button>
-    </div>
-    <div class="stat-grid" id="beranda-stats">
-      <div class="card"><div class="empty">Memuat ringkasan...</div></div>
-    </div>
-    ${p.isLead ? '<div class="view-title" style="margin-bottom:12px;"><h2 style="font-size:17px;">Progres Tim Bulan Ini</h2></div><div class="card" id="beranda-team"><div class="empty">Memuat...</div></div>' : ''}
-  `;
-  container.appendChild(wrap);
-  wrap.querySelector('#btn-cta-isi').addEventListener('click', ()=>{ state.tab='isi'; render(); });
+  const aksesIsi = !!(p.isLead || (p.access && p.access.isiLaporan));
+  const aksesPresensi = !!(p.isLead || (p.access && p.access.presensi));
+  const aksesRiwayat = !!(p.isLead || (p.access && p.access.riwayat));
+  const aksesPdf = !!(p.isLead || (p.access && p.access.laporanPdf));
+
+  let pesan = 'Gunakan menu yang tersedia sesuai hak akses dan tugas Anda.';
+  if(p.isLead){
+    pesan = 'Pantau laporan kerja, presensi, dan kegiatan seluruh tim melalui menu yang tersedia.';
+  }else if(aksesIsi && aksesPresensi){
+    pesan = 'Silakan kelola laporan kerja dan presensi melalui menu yang tersedia.';
+  }else if(aksesIsi){
+    pesan = 'Silakan gunakan menu Isi Laporan untuk mencatat pekerjaan dan kegiatan Anda.';
+  }else if(aksesPresensi){
+    pesan = 'Silakan gunakan menu Absensi / Presensi untuk mencatat dan memantau kehadiran Anda.';
+  }else if(aksesPdf){
+    pesan = 'Arsip laporan yang diberikan kepada Anda dapat diakses melalui menu Arsip Laporan PDF.';
+  }else if(aksesRiwayat){
+    pesan = 'Gunakan menu Riwayat Laporan Saya untuk melihat data laporan yang tersedia bagi Anda.';
+  }
 
   const year = now.getFullYear(), month = now.getMonth()+1;
   const daysInMonth = new Date(year, month, 0).getDate();
   const daysSoFar = now.getDate();
-  const entries = await getEntriesForMonth(p.id, year, month);
-  const filled = Object.keys(entries).length;
-  const todayStr = `${year}-${pad2(month)}-${pad2(now.getDate())}`;
-  const isiHariIni = !!entries[todayStr];
+  const statCards = [];
 
-  const statsEl = wrap.querySelector('#beranda-stats');
-  statsEl.innerHTML = `
-    <div class="stat-card"><div class="num">${filled} / ${daysSoFar}</div><div class="label">Hari terisi bulan ini</div></div>
-    <div class="stat-card"><div class="num">${isiHariIni ? '&#9989;' : '-'}</div><div class="label">Laporan hari ini</div></div>
-    <div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>
+  if(aksesIsi){
+    statCards.push('<div class="stat-card"><div class="num" id="stat-filled">-</div><div class="label">Hari laporan terisi bulan ini</div></div>');
+  }
+  if(aksesPresensi){
+    statCards.push('<div class="stat-card"><div class="num">&#128197;</div><div class="label">Presensi tersedia</div></div>');
+  }
+  if(aksesPdf){
+    statCards.push('<div class="stat-card"><div class="num">&#128196;</div><div class="label">Arsip PDF tersedia</div></div>');
+  }
+  if(!statCards.length && !p.isLead){
+    statCards.push('<div class="stat-card"><div class="num">&#9989;</div><div class="label">Akses aktif sesuai tugas</div></div>');
+  }
+  statCards.push(`<div class="stat-card"><div class="num">${BULAN_NAMA[month-1]}</div><div class="label">${year} - ${daysInMonth} hari</div></div>`);
+
+  wrap.innerHTML = `
+    <div class="cta-banner">
+      <div>
+        <h3>${sapaan}, ${escapeHtml(p.nama.split(',')[0])} &#128075;</h3>
+        <p>${pesan}</p>
+      </div>
+      ${aksesIsi ? '<button class="btn-primary" id="btn-cta-isi" style="background:#fff; color:var(--ink);">&#128221; Isi Laporan Sekarang</button>' : ''}
+    </div>
+    <div class="stat-grid" id="beranda-stats">${statCards.join('')}</div>
+    ${p.isLead ? '<div class="view-title" style="margin-bottom:12px;"><h2 style="font-size:17px;">Progres Tim Bulan Ini</h2></div><div class="card" id="beranda-team"><div class="empty">Memuat...</div></div>' : ''}
   `;
+  container.appendChild(wrap);
+
+  const btnIsi = wrap.querySelector('#btn-cta-isi');
+  if(btnIsi){
+    btnIsi.addEventListener('click', ()=>{ state.tab='isi'; render(); });
+  }
+
+  if(aksesIsi){
+    try{
+      const entries = await getEntriesForMonth(p.id, year, month);
+      const filled = Object.keys(entries).length;
+      const statFilled = wrap.querySelector('#stat-filled');
+      if(statFilled) statFilled.textContent = `${filled} / ${daysSoFar}`;
+    }catch(e){
+      console.error('Gagal memuat ringkasan laporan:',e);
+      const statFilled = wrap.querySelector('#stat-filled');
+      if(statFilled) statFilled.textContent = '-';
+    }
+  }
 
   if(p.isLead){
     const teamEl = wrap.querySelector('#beranda-team');
@@ -1168,13 +1201,13 @@ async function renderBeranda(container){
     for(const person of PEOPLE){
       const e = await getEntriesForMonth(person.id, year, month);
       const f = Object.keys(e).length;
-      const pct = Math.round((f/daysSoFar)*100);
+      const pct = daysSoFar ? Math.round((f/daysSoFar)*100) : 0;
       const row = document.createElement('div');
       row.className = 'team-card';
       row.innerHTML = `
         <div style="display:flex; align-items:center; gap:10px;">
           ${avatarHtml(person)}
-          <div><strong>${person.nama}</strong><div class="meta">${f} dari ${daysSoFar} hari berjalan terisi</div></div>
+          <div><strong>${escapeHtml(person.nama)}</strong><div class="meta">${f} dari ${daysSoFar} hari berjalan terisi</div></div>
         </div>
         <div class="progress-bar" style="margin-top:0;"><div class="progress-fill" style="width:${pct}%"></div></div>
       `;
@@ -1848,6 +1881,20 @@ async function prMuatRiwayat(box, p){
 }
 
 /* ======================= PANEL TEAM LEADER (di tab Laporan Tim) ======================= */
+// Fungsi global khusus modul Presensi. renderRekapPresensiTim berada di luar IIFE
+// modul export laporan, jadi tidak boleh bergantung pada fungsi lokal IIFE tersebut.
+function prMingguDalamBulan_(y, m){
+ const n = new Date(y, m, 0).getDate(), out = [];
+ let cur = [];
+ for(let d = 1; d <= n; d++){
+  cur.push(d);
+  if(new Date(y, m - 1, d).getDay() === 0 || d === n){
+   out.push(cur);
+   cur = [];
+  }
+ }
+ return out;
+}
 async function renderRekapPresensiTim(container){
  const p = currentPerson();
  if(!p || !p.isLead) return;
@@ -1877,11 +1924,14 @@ async function renderRekapPresensiTim(container){
  <div class="pr-export">
  <div class="pr-langkah-judul">📥 Export Daftar Hadir (Excel)</div>
  <div class="pr-export-kontrol">
- <select id="pr-exp-bulan">${bulanOpt}</select>
- <select id="pr-exp-tahun">${tahunOpt}</select>
+ <select id="pr-exp-bulan" title="Bulan">${bulanOpt}</select>
+ <select id="pr-exp-tahun" title="Tahun">${tahunOpt}</select>
+ <select id="pr-exp-minggu" title="Periode"></select>
  <label style="display:flex; align-items:center; gap:6px; font-size:13.5px;"><input type="checkbox" id="pr-exp-foto" checked> Sertakan lampiran foto selfie</label>
+ <label style="display:flex; align-items:center; gap:6px; font-size:13.5px;"><input type="checkbox" id="pr-exp-ttd" checked> Bubuhkan tanda tangan</label>
  <button type="button" class="btn-primary" id="pr-exp-btn">Buat Daftar Hadir</button>
  </div>
+ <div class="pr-kecil-teks pr-muted" style="margin-top:7px;">Periode dapat dipilih <b>satu bulan penuh</b> atau <b>mingguan</b>. Tanda tangan dapat dibubuhkan atau dihilangkan sesuai kebutuhan.</div>
  <div id="pr-exp-hasil" class="pr-kecil-teks" style="margin-top:10px;"></div>
  </div>`;
 
@@ -1926,15 +1976,21 @@ async function renderRekapPresensiTim(container){
  el.querySelector('#pr-tim-tgl').addEventListener('change', muat);
  el.querySelector('#pr-tim-muat').addEventListener('click', muat);
 
+ const expBulan = el.querySelector('#pr-exp-bulan'), expTahun = el.querySelector('#pr-exp-tahun'), expMinggu = el.querySelector('#pr-exp-minggu');
+ const isiPeriodeExport = () => {
+   const y=+expTahun.value, m=+expBulan.value, ww=prMingguDalamBulan_(y,m), bl=BULAN_NAMA[m-1];
+   expMinggu.innerHTML = `<option value="0">Satu bulan penuh (${ww.length} minggu)</option>` + ww.map((h,i)=>`<option value="${i+1}">Minggu ke-${i+1} (${h[0]}${h.length>1?'–'+h[h.length-1]:''} ${bl})</option>`).join('');
+ };
+ expBulan.addEventListener('change',isiPeriodeExport); expTahun.addEventListener('change',isiPeriodeExport); isiPeriodeExport();
  const expBtn = el.querySelector('#pr-exp-btn');
  expBtn.addEventListener('click', async () => {
- const y = +el.querySelector('#pr-exp-tahun').value, m = +el.querySelector('#pr-exp-bulan').value;
- const foto = el.querySelector('#pr-exp-foto').checked;
+ const y = +expTahun.value, m = +expBulan.value, minggu=+expMinggu.value;
+ const foto = el.querySelector('#pr-exp-foto').checked, ttd = el.querySelector('#pr-exp-ttd').checked;
  const hasil = el.querySelector('#pr-exp-hasil');
  expBtn.disabled = true;
  hasil.innerHTML = '⏳ Sedang membuat file Daftar Hadir… Mohon tunggu' + (foto ? ' (bisa 1–4 menit karena menyertakan foto).' : '.');
  try{
- const r = await prCallServer('apiExportDaftarHadir', p.id, y, m, foto);
+ const r = await prCallServer('apiExportDaftarHadir', p.id, y, m, foto, minggu, ttd);
  if(!r || !r.ok) throw new Error((r && r.error) || 'Gagal membuat file');
  hasil.innerHTML = `✅ Berhasil: <b>${prEsc(r.namaFile)}</b><br>
  <a href="${prEsc(r.url)}" target="_blank" rel="noopener">Buka di Google Sheets</a> &middot;
@@ -1955,6 +2011,13 @@ async function renderRekapPresensiTim(container){
      (di bawah modul presensi). Kode lain TIDAK perlu diubah.
      ===================================================================== -->
 <style>
+ .rt-grafik-wrap{margin-top:18px; padding-top:18px; border-top:1px solid var(--line);}
+ .rt-grafik-kontrol{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0 14px;}
+ .rt-grafik{width:100%; overflow:auto; border:1px solid var(--line); border-radius:10px; background:#fff; padding:10px;}
+ .rt-grafik svg{display:block; min-width:720px; width:100%; height:260px;}
+ .rt-status{display:inline-block; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:700; margin-top:4px;}
+ .rt-status.no-presensi{background:#F1F3F5; color:#666;}
+ .rt-status.presensi{background:var(--ok-soft); color:#28663A;}
  .ex-kontrol{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
  .ex-cek{display:flex; align-items:center; gap:6px; font-size:13.5px;}
  .ex-info{font-size:12.5px; color:var(--ink-soft); margin-top:8px;}
@@ -2287,43 +2350,186 @@ async function renderRekapPresensiTim(container){
   formPin('');
  }
 
- /* ======================= SAMBUNGKAN KE HALAMAN YANG SUDAH ADA ======================= */
- // Riwayat Laporan Saya & detail anggota di Laporan Tim -> tambah kartu "Buat file laporan kerja"
+ /* ======================= v17: ARSIP PDF, KELOLA ANGGOTA & LAPORAN TIM ======================= */
+ async function exPost(action, payload){
+  if(typeof WEB_APP_URL === 'undefined' || String(WEB_APP_URL).indexOf('https://') !== 0) throw new Error('WEB_APP_URL belum diisi.');
+  const body = Object.assign({ action, requesterId: state.personId, pin: state.pin }, payload || {});
+  let res;
+  try{ res = await fetch(WEB_APP_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}); }
+  catch(e){ throw new Error('Tidak dapat terhubung ke server.'); }
+  const teks=await res.text(); let data;
+  try{data=JSON.parse(teks);}catch(e){throw new Error('Respons server tidak valid. Deploy Code.gs terbaru.');}
+  if(!data.ok) throw new Error(data.error||'Gagal'); return data;
+ }
+
+ function kartuLaporanTim(){
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<h3 style="font-size:15.5px;margin:0 0 12px;">📥 Buat Laporan Kerja Tim</h3>
+   <div class="ex-kontrol"><select data-f="orang"></select><select data-f="bulan"></select><select data-f="tahun"></select><select data-f="minggu"></select>
+   <label class="ex-cek"><input type="checkbox" data-f="ttd" checked> Bubuhkan tanda tangan</label><button class="btn-primary" data-f="btn">Buat Laporan</button></div>
+   <div class="ex-info">Hanya Team Leader yang membuat file laporan. Pilih anggota, bulan, lalu satu minggu atau satu bulan penuh.</div><div class="ex-hasil" data-f="hasil"></div>`;
+  const orang=card.querySelector('[data-f="orang"]'); orang.innerHTML=PEOPLE.map(p=>`<option value="${esc(p.id)}">${esc(p.nama)}${p.isLead?' (Leader)':''}</option>`).join('');
+  const ambil=pasangPeriode(card,state.historyYear,state.historyMonth);
+  const btn=card.querySelector('[data-f="btn"]'), hasil=card.querySelector('[data-f="hasil"]');
+  btn.onclick=async()=>{const per=ambil();btn.disabled=true;hasil.textContent='⏳ Membuat file laporan…';try{const r=await exPost('exportlaporan',{personId:orang.value,year:per.year,month:per.month,minggu:per.minggu,pakaiTtd:card.querySelector('[data-f="ttd"]').checked});hasil.innerHTML=hasilHtml(r);}catch(e){hasil.innerHTML=`<span style="color:var(--libur)">Gagal: ${esc(e.message)}</span>`;}btn.disabled=false;};
+  return card;
+ }
+
+ async function renderLaporanPdf(container){
+  const p=currentPerson(); if(!p || (!p.isLead && !(p.access&&p.access.laporanPdf))) return;
+  const wrap=document.createElement('div'); wrap.innerHTML=`<div class="view-title"><div class="badge-ico">📚</div><div><h2>Arsip PDF</h2><p>Arsip Laporan Kerja dan Daftar Hadir PDF. Hak akses ditentukan oleh Team Leader.</p></div></div>`; container.appendChild(wrap);
+  const PDF_TEAM_ID='__TEAM_IT_SETWAN_LANGKAT__';
+  const PDF_TEAM_NAME='Tim IT Setwan Langkat';
+  if(p.isLead){
+   const upload=document.createElement('div'); upload.className='card'; upload.innerHTML=`<h3 style="font-size:15px;margin:0 0 12px;">⬆️ Tambah arsip PDF</h3>
+    <div class="row"><div class="field" style="flex:1;min-width:180px;"><label>Jenis Arsip</label><select data-f="jenis"><option>Laporan Kerja</option><option>Daftar Hadir</option></select></div><div class="field" style="flex:1;min-width:220px;"><label>Anggota / Tim</label><select data-f="orang"></select></div><div class="field" style="flex:1;min-width:180px;"><label>Periode</label><input type="text" data-f="periode" placeholder="Contoh: Oktober 2026 / Minggu ke-2"></div></div>
+    <div class="field"><label>File PDF</label><input type="file" data-f="file" accept="application/pdf"></div><div class="field"><label>Keterangan</label><input type="text" data-f="ket" placeholder="Keterangan singkat (opsional)"></div>
+    <button class="btn-primary" data-f="upload">Simpan PDF</button><div class="ex-hasil" data-f="hasil"></div>`;
+   const jenisEl=upload.querySelector('[data-f="jenis"]');
+   const orangEl=upload.querySelector('[data-f="orang"]');
+   function isiPilihanTarget(){
+     const jenis=jenisEl.value;
+     const opts=[];
+     if(jenis==='Daftar Hadir') opts.push(`<option value="${PDF_TEAM_ID}">${PDF_TEAM_NAME}</option>`);
+     PEOPLE.forEach(x=>opts.push(`<option value="${esc(x.id)}">${esc(x.nama)}</option>`));
+     orangEl.innerHTML=opts.join('');
+     orangEl.value=jenis==='Daftar Hadir' ? PDF_TEAM_ID : (PEOPLE[0] ? PEOPLE[0].id : '');
+   }
+   jenisEl.addEventListener('change',isiPilihanTarget);
+   isiPilihanTarget();
+   upload.querySelector('[data-f="upload"]').onclick = async function(){
+    const f = upload.querySelector('[data-f="file"]').files[0];
+    if(!f){ showToast('Pilih file PDF dulu.'); return; }
+    if(f.type !== 'application/pdf'){ showToast('File harus PDF.'); return; }
+    const reader = new FileReader();
+    reader.onload = async function(){
+      const b = upload.querySelector('[data-f="upload"]');
+      const h = upload.querySelector('[data-f="hasil"]');
+      b.disabled = true; h.textContent = '⏳ Mengunggah PDF…';
+      try{
+       await exPost('pdf_upload',{fileBase64:reader.result,fileName:f.name,targetPersonId:orangEl.value,periode:upload.querySelector('[data-f="periode"]').value,keterangan:upload.querySelector('[data-f="ket"]').value,jenis:jenisEl.value});
+       h.innerHTML = '<span style="color:var(--ok)">✅ PDF berhasil disimpan.</span>';
+       upload.querySelector('[data-f="file"]').value = '';
+       await muat();
+      }catch(e){ h.innerHTML = `<span style="color:var(--libur)">Gagal: ${esc(e.message)}</span>`; }
+      b.disabled = false;
+    };
+    reader.readAsDataURL(f);
+   };
+   wrap.appendChild(upload);
+  }
+  const listCard=document.createElement('div');listCard.className='card';listCard.innerHTML=`<h3 style="font-size:15px;margin:0 0 12px;">📚 Arsip PDF</h3>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+    <button class="btn-secondary" data-filter="Laporan Kerja">📄 Laporan Kerja</button><button class="btn-secondary" data-filter="Daftar Hadir">🗓️ Daftar Hadir</button><button class="btn-secondary" data-filter="Semua">📚 Semua</button>
+   </div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;">
+    <div class="field" style="flex:1;min-width:190px;margin:0;"><label>Anggota / Tim</label><select data-f="anggota"><option value="">Semua anggota / tim</option></select></div>
+    <div class="field" style="flex:1;min-width:150px;margin:0;"><label>Bulan</label><select data-f="bulan"><option value="">Semua bulan</option></select></div>
+    <div class="field" style="flex:1;min-width:130px;margin:0;"><label>Tahun</label><select data-f="tahun"><option value="">Semua tahun</option></select></div>
+    <button type="button" class="btn-secondary" data-f="reset">↺ Reset</button>
+   </div>
+   <div data-f="ringkasan" style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;"></div>
+   <div data-f="list"><div class="empty">Memuat…</div></div>`;wrap.appendChild(listCard);
+  const listEl=listCard.querySelector('[data-f="list"]'); let semua=[]; let filter='Laporan Kerja';
+  const anggotaEl=listCard.querySelector('[data-f="anggota"]');
+  const bulanEl=listCard.querySelector('[data-f="bulan"]');
+  const tahunEl=listCard.querySelector('[data-f="tahun"]');
+  const ringkasanEl=listCard.querySelector('[data-f="ringkasan"]');
+  const bulanMap={'januari':1,'februari':2,'maret':3,'april':4,'mei':5,'juni':6,'juli':7,'agustus':8,'september':9,'oktober':10,'november':11,'desember':12};
+  function periodeInfo(s){
+    const t=String(s||'').toLowerCase();
+    const ym=t.match(/\b(20\d{2})\b/);
+    let month='';
+    Object.keys(bulanMap).some(n=>{if(t.indexOf(n)>=0){month=String(bulanMap[n]);return true;}return false;});
+    if(!month){
+      const slash=t.match(/\b(0?[1-9]|1[0-2])\s*[\/-]\s*20\d{2}\b/);
+      if(slash) month=String(Number(slash[1]));
+    }
+    return {year:ym?ym[1]:'',month};
+  }
+  function isiFilterAnggota(){
+    const cur=anggotaEl.value;
+    const map=new Map();
+    semua.forEach(x=>{const id=String(x.personId||'');const nama=String(x.namaAnggota||'');if(id&&!map.has(id))map.set(id,nama);});
+    anggotaEl.innerHTML='<option value="">Semua anggota / tim</option>'+Array.from(map.entries()).sort((a,b)=>a[1].localeCompare(b[1],'id')).map(([id,nama])=>`<option value="${esc(id)}">${esc(nama)}</option>`).join('');
+    if([...anggotaEl.options].some(o=>o.value===cur)) anggotaEl.value=cur;
+  }
+  function isiFilterPeriode(){
+    const curM=bulanEl.value, curY=tahunEl.value; const years=new Set();
+    semua.forEach(x=>{const pi=periodeInfo(x.periode);if(pi.year)years.add(pi.year);});
+    tahunEl.innerHTML='<option value="">Semua tahun</option>'+Array.from(years).sort().reverse().map(y=>`<option value="${y}">${y}</option>`).join('');
+    bulanEl.innerHTML='<option value="">Semua bulan</option>'+BULAN_NAMA.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('');
+    if([...tahunEl.options].some(o=>o.value===curY)) tahunEl.value=curY;
+    if([...bulanEl.options].some(o=>o.value===curM)) bulanEl.value=curM;
+  }
+  function renderList(){
+    const anggota=anggotaEl.value, bulan=bulanEl.value, tahun=tahunEl.value;
+    let data=filter==='Semua'?semua:semua.filter(x=>x.jenis===filter);
+    data=data.filter(x=>{
+      if(anggota && String(x.personId)!==anggota) return false;
+      const pi=periodeInfo(x.periode);
+      if(tahun && pi.year!==tahun) return false;
+      if(bulan && pi.month!==bulan) return false;
+      return true;
+    });
+    ringkasanEl.textContent=`Menampilkan ${data.length} arsip${semua.length?' dari '+semua.length+' total arsip':''}.`;
+    if(!data.length){listEl.innerHTML=`<div class="empty">Tidak ada arsip yang sesuai dengan filter saat ini.</div>`;return;}
+    listEl.innerHTML=`<div style="overflow:auto"><table><thead><tr><th>Jenis</th><th>Anggota</th><th>Periode</th><th>File</th><th>Diunggah</th><th>Aksi</th></tr></thead><tbody>${data.map(x=>`<tr><td data-label="Jenis">${esc(x.jenis)}</td><td data-label="Anggota">${esc(x.namaAnggota)}</td><td data-label="Periode">${esc(x.periode)}</td><td data-label="File">${esc(x.namaFile)}</td><td data-label="Diunggah">${esc(x.diunggahPada)}</td><td class="row-actions"><button class="btn-secondary" data-pdf="${esc(x.pdfId)}">⬇️ Download</button></td></tr>`).join('')}</tbody></table></div>`;
+    listEl.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await exPost('pdf_download',{pdfId:b.dataset.pdf});const bytes=Uint8Array.from(atob(r.base64),c=>c.charCodeAt(0));const blob=new Blob([bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=r.namaFile;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}catch(e){showToast('Gagal download: '+e.message);}b.disabled=false;});
+  }
+  async function muat(){listEl.innerHTML='<div class="empty">Memuat…</div>';try{const r=await exPost('pdf_list');semua=r.data||[];isiFilterAnggota();isiFilterPeriode();renderList();}catch(e){listEl.innerHTML=`<div class="empty" style="color:var(--libur)">${esc(e.message)}</div>`;}}
+  listCard.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;renderList();});
+  [anggotaEl,bulanEl,tahunEl].forEach(el=>el.addEventListener('change',renderList));
+  listCard.querySelector('[data-f="reset"]').onclick=()=>{anggotaEl.value='';bulanEl.value='';tahunEl.value='';filter='Laporan Kerja';renderList();};
+  await muat();
+ }
+
+ async function renderKelolaAnggota(container){
+  const p=currentPerson();if(!p||!p.isLead)return;
+  const card=document.createElement('div');card.className='card';card.innerHTML=`<h3 style="font-size:15px;margin:0 0 6px;">👥 Kelola Anggota Tim</h3><p class="ex-info">Team Leader dapat menambah, mengedit, menghapus anggota, dan menentukan menu yang boleh digunakan.</p><div data-f="list"><div class="empty">Memuat…</div></div>
+   <details style="margin-top:16px"><summary style="cursor:pointer;font-weight:700">➕ Tambah anggota baru</summary><div style="padding-top:14px" data-f="form"><div class="row"><div class="field"><label>PersonId</label><input data-f="id" placeholder="contoh: budi"></div><div class="field"><label>Nama</label><input data-f="nama" placeholder="Nama lengkap"></div><div class="field"><label>Gelar</label><input data-f="gelar" placeholder="Contoh: S.Kom."></div><div class="field"><label>Jabatan</label><input data-f="jabatan" value="Staff IT"></div></div><div class="row"><div class="field"><label>PIN awal</label><input data-f="pin" type="password" value="0000"></div><div class="field"><label>Email</label><input data-f="email" type="text"></div></div><div class="ex-info">Hak akses awal:</div><div data-f="checks"></div><button class="btn-primary" data-f="add">Tambah Anggota</button></div></details>`;container.appendChild(card);
+  const perms=[['beranda','Beranda'],['isiLaporan','Isi Laporan'],['riwayat','Riwayat Laporan Saya'],['presensi','Absensi/Presensi'],['laporanPdf','Arsip PDF']];
+  card.querySelector('[data-f="checks"]').innerHTML=perms.map(([k,l])=>`<label style="display:inline-flex;gap:7px;align-items:center;margin:5px 14px 5px 0"><input type="checkbox" data-access="${k}" ${k==='beranda'||k==='isiLaporan'||k==='riwayat'||k==='presensi'?'checked':''}>${l}</label>`).join('');
+  function tombolAksi(x){return x.isLead?'—':`<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-secondary" data-edit="${esc(x.id)}">✏️ Edit</button><button class="btn-secondary" data-delete="${esc(x.id)}" style="border-color:#e4b0aa;color:#a33;">🗑️ Hapus</button></div>`;}
+  async function muat(){const box=card.querySelector('[data-f="list"]');box.innerHTML='<div class="empty">Memuat…</div>';try{const r=await exPost('member_list');box.innerHTML=`<div style="overflow:auto"><table><thead><tr><th>Anggota</th><th>Jabatan</th><th>Hak Akses</th><th>Aksi</th></tr></thead><tbody>${r.data.map(x=>`<tr><td>${esc(x.nama)}${x.gelar?`, ${esc(x.gelar)}`:''}${x.isLead?' <span class="pr-badge info">Leader</span>':''}</td><td>${esc(x.jabatan)}</td><td>${perms.map(([k,l])=>`<label style="display:inline-flex;gap:5px;margin-right:8px;font-size:12px"><input type="checkbox" data-member="${esc(x.id)}" data-access="${k}" ${x.isLead||x.access[k]?'checked':''} ${x.isLead?'disabled':''}>${l}</label>`).join('')}</td><td>${tombolAksi(x)}</td></tr>`).join('')}</tbody></table></div>`;
+    box.querySelectorAll('input[data-member]:not(:disabled)').forEach(ch=>ch.addEventListener('change',async()=>{const id=ch.dataset.member;const inputs=[...box.querySelectorAll(`input[data-member="${CSS.escape(id)}"]`)];const access={};inputs.forEach(i=>access[i.dataset.access]=i.checked);try{await exPost('member_access',{memberId:id,access});showToast('Hak akses diperbarui');}catch(e){showToast('Gagal: '+e.message);await muat();}}));
+    box.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=async()=>{const x=r.data.find(a=>a.id===btn.dataset.edit);if(!x)return;const nama=prompt('Nama anggota:',x.nama);if(nama===null)return;const gelar=prompt('Gelar (opsional):',x.gelar||'');if(gelar===null)return;const jabatan=prompt('Jabatan:',x.jabatan||'Staff IT');if(jabatan===null)return;const pin=prompt('PIN baru (kosong = PIN tetap):','');if(pin===null)return;try{await exPost('member_update',{memberId:x.id,member:{nama:nama.trim(),gelar:gelar.trim(),jabatan:jabatan.trim(),pin:pin.trim(),email:x.email||''}});showToast('Data anggota diperbarui');await muat();}catch(e){showToast('Gagal: '+e.message);}});
+    box.querySelectorAll('[data-delete]').forEach(btn=>btn.onclick=async()=>{const x=r.data.find(a=>a.id===btn.dataset.delete);if(!x)return;if(!confirm(`Hapus anggota ${x.nama}?\n\nAnggota tidak lagi dapat login, tetapi data laporan/presensi lama tetap disimpan.`))return;try{await exPost('member_delete',{memberId:x.id});showToast('Anggota dihapus');await muat();}catch(e){showToast('Gagal: '+e.message);}});
+  }catch(e){box.innerHTML=`<div class="empty" style="color:var(--libur)">${esc(e.message)}</div>`;}}
+  card.querySelector('[data-f="add"]').onclick=async()=>{const access={};card.querySelectorAll('[data-f="checks"] input').forEach(i=>access[i.dataset.access]=i.checked);try{await exPost('member_add',{member:{id:card.querySelector('[data-f="id"]').value,nama:card.querySelector('[data-f="nama"]').value,gelar:card.querySelector('[data-f="gelar"]').value,jabatan:card.querySelector('[data-f="jabatan"]').value,pin:card.querySelector('[data-f="pin"]').value,email:card.querySelector('[data-f="email"]').value,access}});showToast('Anggota berhasil ditambahkan');card.querySelector('details').open=false;muat();}catch(e){showToast('Gagal: '+e.message);}};
+  await muat();
+ }
+
+ /* ---------------- INTEGRASI HALAMAN ---------------- */
  const riwayatAsli = renderRiwayat;
- renderRiwayat = function(container, personId){
-  const janji = riwayatAsli.apply(this, arguments);
-  try{
-   const subs = container.querySelectorAll('.sticky-subheader');
-   const kartu = kartuLaporanKerja(personId);
-   if(subs.length) subs[subs.length - 1].after(kartu); else container.appendChild(kartu);
-  }catch(e){ console.error(e); }
-  return janji;
- };
+ // Riwayat sekarang murni riwayat; TIDAK lagi menampilkan kartu Buat Laporan.
+ // Pembuatan laporan dipindahkan ke Laporan Tim dan hanya untuk Leader.
 
- // Pengaturan -> tambah kartu Tanda Tangan Digital
  const pengaturanAsli = renderPengaturan;
- renderPengaturan = async function(container){
-  await pengaturanAsli.apply(this, arguments);
-  if(container.isConnected) kartuTandaTangan(container);
- };
+ renderPengaturan = async function(container){ await pengaturanAsli.apply(this,arguments); if(container.isConnected) kartuTandaTangan(container); };
 
- // Panel Presensi Tim -> export Daftar Hadir dengan pilihan minggu & tanda tangan
- const rekapPresensiAsli = renderRekapPresensiTim;
- renderRekapPresensiTim = function(container){
-  const janji = rekapPresensiAsli.apply(this, arguments);
-  try{ perbaruiExportPresensi(container); }catch(e){ console.error(e); }
-  return janji;
- };
-
- // Laporan Tim -> perbarui teks petunjuk
  const timAsli = renderTim;
- renderTim = function(container){
-  const janji = timAsli.apply(this, arguments);
-  try{
-   const d = container.querySelector('.view-title p');
-   if(d) d.innerHTML = 'Pantau laporan seluruh anggota. Klik <strong>Lihat / Edit</strong> pada anggota untuk membuat file Excel laporannya, sebulan penuh atau per minggu.';
-  }catch(e){ console.error(e); }
-  return janji;
+ renderTim = async function(container){
+   await timAsli.apply(this,arguments);
+   try{
+    const p=currentPerson(); if(!p||!p.isLead)return;
+    const anchor=container.querySelector('#detail-area');
+    const reportCard=kartuLaporanTim();
+    if(anchor&&anchor.parentNode) anchor.parentNode.insertBefore(reportCard,anchor); else container.prepend(reportCard);
+    const manage=document.createElement('div'); manage.className='card'; manage.innerHTML='<h3 style="font-size:15px;margin:0 0 6px;">👥 Kelola Anggota Tim</h3><p class="ex-info">Tambah anggota baru dan atur hak akses menu melalui checkbox.</p>';
+    const btn=document.createElement('button');btn.className='btn-secondary';btn.textContent='Buka Kelola Anggota';btn.onclick=()=>{state.tab='pengaturanAnggota';render();};
+    manage.appendChild(btn); if(anchor&&anchor.parentNode) anchor.parentNode.insertBefore(manage,anchor); else container.prepend(manage);
+   }catch(e){console.error(e);}
+ };
+
+ // Tab khusus kelola anggota tidak ditampilkan sebagai sidebar; dibuka dari Laporan Tim.
+ const renderAsli = window.render;
+ window.render = async function(){
+   if(state.tab==='pengaturanAnggota'){
+     renderSidebar();renderTopbar();syncUrlHash();const main=document.getElementById('main');main.innerHTML='';const title=document.createElement('div');title.className='view-title';title.innerHTML='<div class="badge-ico">👥</div><div><h2>Kelola Anggota Tim</h2><p>Team Leader menentukan menu dan hak akses anggota.</p></div>';main.appendChild(title);await renderKelolaAnggota(main);return;
+   }
+   if(state.tab==='laporanPdf'){renderSidebar();renderTopbar();syncUrlHash();const main=document.getElementById('main');main.innerHTML='';await renderLaporanPdf(main);return;}
+   return renderAsli.apply(this,arguments);
  };
 })();
 </script>  
