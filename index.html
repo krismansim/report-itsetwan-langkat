@@ -348,14 +348,30 @@
 
   @media (max-width: 380px){
     .topbar{
-      min-height:60px;
+      min-height:64px;
       padding:8px 9px;
     }
+    /* Jam/tanggal tetap tampil di halaman awal sebelum login. */
     .topbar-clock{
-      display:none;
+      display:block !important;
+      font-size:10.5px;
+      line-height:1.35;
+      text-align:right;
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+    .topbar-clock .row{
+      justify-content:flex-end;
+      gap:5px;
+      white-space:nowrap;
+    }
+    .topbar-right{
+      width:100%;
+      justify-content:flex-end;
+      gap:8px;
     }
     .topbar-user{
-      max-width:calc(100vw - 115px);
+      max-width:calc(100vw - 125px);
     }
     .topbar-logout{
       padding:7px 9px;
